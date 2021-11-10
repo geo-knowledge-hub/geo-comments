@@ -17,13 +17,13 @@ class UserFeedbackResourceConfig(ResourceConfig):
     blueprint_name = "geo_feedback"
 
     request_view_args = {
-        "feedback_id": ma.fields.Int(),
+        "feedback_id": ma.fields.String(),
         "pid_value": ma.fields.String()
     }
 
     request_search_args = {
         # properties
-        "id": ma.fields.Int(),
+        "id": ma.fields.String(),
         "user_id": ma.fields.Int(),
 
         # status
