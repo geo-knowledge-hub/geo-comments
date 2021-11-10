@@ -7,6 +7,10 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
+"""Data model for GEO Knowledge Hub User's Feedback Component."""
+
+import uuid
+
 from invenio_db import db
 from invenio_records.models import RecordMetadataBase
 
@@ -20,9 +24,15 @@ from invenio_rdm_records.records.models import RDMRecordMetadata as InvenioRecor
 
 
 class UserFeedbackMetadata(db.Model, RecordMetadataBase):
+    """Represent a user feedback record."""
     __tablename__ = "users_feedback"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(
+        UUIDType,
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    """Record identifier."""
 
     is_approved = db.Column(db.Boolean, nullable=False, default=False)
     json = db.Column(mutable_json_type(dbtype=JSONB(none_as_null=True), nested=True), nullable=True)

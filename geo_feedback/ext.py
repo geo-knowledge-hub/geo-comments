@@ -7,7 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-"""Feedback module for Geo Knowledge Hub"""
+"""Feedback module for GEO Knowledge Hub"""
 
 from flask_babelex import gettext as _
 

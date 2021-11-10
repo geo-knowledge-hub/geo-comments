@@ -123,6 +123,7 @@ class FeedbackRecord(FeedbackRecordBase):
             **(self.json or {})
         }
 
-    __all__ = (
-        "FeedbackRecord"
-    )
+
+__all__ = (
+    "FeedbackRecord"
+)

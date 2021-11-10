@@ -7,7 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-"""Feedback module for Geo Knowledge Hub"""
+"""Feedback module for GEO Knowledge Hub User's Feedback Component."""
 
 import os
 
@@ -27,29 +27,19 @@ extras_require = {
     'docs': [
         'Sphinx>=3,<4',
     ],
-    # Elasticsearch version
     'elasticsearch6': [
         f'invenio-search[elasticsearch6]{invenio_search_version}',
     ],
     'elasticsearch7': [
         f'invenio-search[elasticsearch7]{invenio_search_version}',
     ],
-    # Databases
-    'mysql': [
-        f'invenio-db[mysql,versioning]{invenio_db_version}',
-    ],
     'postgresql': [
         f'invenio-db[postgresql,versioning]{invenio_db_version}',
-    ],
-    'sqlite': [
-        f'invenio-db[versioning]{invenio_db_version}',
     ],
     'tests': tests_require,
 }
 
-extras_require['all'] = []
-for reqs in extras_require.values():
-    extras_require['all'].extend(reqs)
+extras_require['all'] = [req for _, reqs in extras_require.items() for req in reqs]
 
 setup_requires = [
     'Babel>=2.8',
@@ -76,7 +66,7 @@ setup(
     long_description=readme + '\n\n' + history,
     keywords='Geo Knowledge Hub',
     license='MIT',
-    author='Group on Earth Observations (GEO)',
+    author='GEO Secretariat',
     author_email='geokhub@geosec.org',
     url='https://github.com/geo-knowledge-hub/geo-feedback',
     packages=packages,
@@ -94,13 +84,13 @@ setup(
             "geo_feedback = geo_feedback.config",
         ],
         'invenio_base.api_apps': [
-            'gkext_comments = geo_feedback:GEOFeedback',
+            'geo_feedback = geo_feedback:GEOFeedback',
         ],
         'invenio_assets.webpack': [
-            'gkext_feedback_assets = geo_feedback.theme.webpack:theme'
+            'geo_feedback = geo_feedback.theme.webpack:theme'
         ],
         'invenio_base.api_blueprints': [
-            'gkext_feedback_api = geo_feedback.views:create_feedback_api_blueprint',
+            'geo_feedback = geo_feedback.views:create_feedback_api_blueprint',
         ],
         'invenio_i18n.translations': [
             'messages = geo_feedback',
@@ -108,12 +98,7 @@ setup(
         # 'invenio_access.actions': [],
         # 'invenio_admin.actions': [],
         # 'invenio_assets.bundles': [],
-        # 'invenio_base.api_apps': [],
-        # 'invenio_base.api_blueprints': [],
         # 'invenio_base.blueprints': [],
-        # 'invenio_celery.tasks': [],
-        # 'invenio_db.models': [],
-        # 'invenio_pidstore.minters': [],
         # 'invenio_records.jsonresolver': [],
     },
     extras_require=extras_require,
