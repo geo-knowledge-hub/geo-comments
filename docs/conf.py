@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2021 Group on Earth Observations (GEO).
+# This file is part of GEO Knowledge Hub User's Feedback Component.
+# Copyright 2021 GEO Secretariat.
 #
-# geo-feedback is free software; you can redistribute it and/or modify it
+# GEO Knowledge Hub User's Feedback Component is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
+#
 
 """Sphinx configuration."""
 
