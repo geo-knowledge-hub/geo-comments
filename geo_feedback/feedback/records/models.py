@@ -14,6 +14,7 @@ import uuid
 from invenio_db import db
 from invenio_records.models import RecordMetadataBase
 
+from sqlalchemy import UniqueConstraint
 from sqlalchemy_json import mutable_json_type
 
 from sqlalchemy_utils.types import UUIDType
@@ -42,6 +43,8 @@ class UserFeedbackMetadata(db.Model, RecordMetadataBase):
 
     record_metadata_id = db.Column(UUIDType, db.ForeignKey(InvenioRecordMetadata.id))
     record_metadata = db.relationship(InvenioRecordMetadata)
+
+    UniqueConstraint("user_id", "record_metadata_id")
 
     version_id = None
     __mapper_args__ = {}

@@ -8,7 +8,7 @@
 
 from ..schema import FeedbackSchema
 from ..records.api import FeedbackRecord
-from .components import UserFeedbackMetadata
+from .components import UserFeedbackMetadata, UserFeedbackMetadataIntegrity
 
 from ..permission import RecordRatingPermissionPolicy
 
@@ -25,7 +25,9 @@ class FeedbackServiceConfig:
 
     # Service components
     components = [
-        UserFeedbackMetadata,
+        # position matters
+        UserFeedbackMetadataIntegrity,
+        UserFeedbackMetadata
     ]
 
 
