@@ -5,6 +5,8 @@
 # geo-feedback is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
+from flask_babelex import gettext as _
+from marshmallow import ValidationError
 
 from invenio_records_resources.services.records.components import \
     ServiceComponent as BaseServiceComponent
@@ -43,6 +45,18 @@ class UserFeedbackMetadata(UserFeedbackComponentBase):
         feedback.json = data
 
 
+class UserFeedbackMetadataIntegrity(UserFeedbackComponentBase):
+
+    def create_feedback(self, identity, feedback=None, data=None, record=None, **kwargs):
+        records = feedback.get_records(record_id=record.id, user_id=identity.user.id)
+
+        if records:
+            raise ValidationError(
+                _("The user has already registered feedback on this record.")
+            )
+
+
 __all__ = (
-    "UserFeedbackMetadata"
+    "UserFeedbackMetadata",
+    "UserFeedbackMetadataIntegrity"
 )
