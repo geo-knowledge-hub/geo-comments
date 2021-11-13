@@ -75,3 +75,9 @@ target/
 # Ignore local virtualenv (if present)
 .venv/
 venv/
+
+# GEO Knowledge Hub User's Feedback
+docs/spec/node_modules
+docs/spec/package-lock.json
+docs/spec/dist/index.html
+

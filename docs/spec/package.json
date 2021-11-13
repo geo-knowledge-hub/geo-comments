@@ -1,0 +1,14 @@
+{
+  "name": "geo-feedback",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "redoc-cli bundle geo-feedback.yaml --output dist/index.html"
+  },
+  "author": "GEO Secretariat",
+  "license": "MIT",
+  "dependencies": {
+    "redoc-cli": "^0.10.2"
+  }
+}

@@ -1,0 +1,272 @@
+openapi: 3.0.0
+
+info:
+  title: GEO Knowledge Hub User's Feedback
+  description: |
+    A REST API to allow users expressing their experience about a
+    Knowledge Package in the [GEO Knowledge Hub](https://github.com/geo-knowledge-hub/geo-knowledge-hub>).
+  contact:
+    name: GEO Knowledge Hub Team
+    url: 'https://geo-knowledge-hub.github.io'
+    email: geokhub@geosec.org
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+  version: '1.0'
+  x-logo:
+    url: 'https://geo-knowledge-hub.github.io/_static/logo.png'
+    altText: GEO Knowledge Hub
+    href: 'https://geo-knowledge-hub.github.io'
+
+servers:
+  - url: 'https://localhost/geo-feedback/'
+    description: Production server
+  - url: 'https://localhost/dev/geo-feedback/'
+    description: Development server
+
+paths:
+
+  /{feedback_id}:
+    parameters:
+      - $ref: '#/components/parameters/feedback_id'
+    get:
+      tags:
+        - feedback
+      summary: Returns the metadata of a given user feedback.
+      description: |
+        Returns a given user feedback metadata without
+        sensitive fields.
+      operationId: get_feedback
+      responses:
+        '200':
+          $ref: '#/components/responses/UserFeedback'
+        '404':
+          $ref: '#/components/responses/InvalidUserFeedbackID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - feedback
+      summary: Mark the user feedback as deleted.
+      description: |
+        Mark the given user feedback as deleted.
+        No actual deletion is performed. Only
+        feedbacks owned by the current user or
+        moderator can be marked as deleted.
+      operationId: remove_feedback
+      responses:
+        '204':
+          description: The user feedback was deleted.
+        '403':
+          description: The client does not have access rights to delete the feedback.
+        '404':
+          $ref: '#/components/responses/InvalidUserFeedbackID'
+
+  /{feedback_id}/actions/deny:
+    parameters:
+      - $ref: '#/components/parameters/feedback_id'
+    post:
+      tags:
+        - feedback
+      summary: Mark the user feedback as invalid.
+      description: |
+        A user moderator can approve or reject a given user feedback.
+      operationId: deny_feedback
+      responses:
+        '200':
+          $ref: '#/components/responses/UserFeedback'
+        '404':
+          $ref: '#/components/responses/InvalidUserFeedbackID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /{feedback_id}/actions/allow:
+    parameters:
+      - $ref: '#/components/parameters/feedback_id'
+    post:
+      tags:
+        - feedback
+      summary: Mark the user feedback as valid.
+      description: |
+        A user moderator can approve or reject a given user feedback.
+      operationId: allow_feedback
+      responses:
+        '200':
+          $ref: '#/components/responses/UserFeedback'
+        '404':
+          $ref: '#/components/responses/InvalidUserFeedbackID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /record/{recid}:
+    parameters:
+      - $ref: '#/components/parameters/recid'
+    get:
+      tags:
+        - feedback
+      summary: Returns all users feedback for a given record.
+      description: |
+        Returns an array with all users feedback for a given record identifier.
+        If none is found, it returns an empty array.
+      operationId: get_record_feedbacks
+      responses:
+        '200':
+          $ref: '#/components/responses/UsersFeedback'
+        '404':
+          $ref: '#/components/responses/InvalidRecordID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    post:
+      tags:
+        - feedback
+      summary: Create a new user feedback for a given InvenioRDM record.
+      description: |
+        Creates a new user feedback for a given InvenioRDM record
+        and associate it to the current user.
+      operationId: create_feedback
+      requestBody:
+        $ref: '#/components/requestBodies/UserFeedback'
+      responses:
+        '200':
+          $ref: '#/components/responses/UsersFeedback'
+        '404':
+          $ref: '#/components/responses/InvalidRecordID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /user/<user_id>:
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+    get:
+      tags:
+        - user_feedback
+      summary: Returns all feedbacks provided by a given user.
+      description: |
+        Returns an array with all feedback for a given user identifier.
+        If none is found, it returns an empty array.
+      operationId: get_user_feedbacks
+      responses:
+        '200':
+          $ref: '#/components/responses/UsersFeedback'
+        '404':
+          $ref: '#/components/responses/InvalidUserID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    ExceptionType:
+      title: Service Exception Type
+      description: A general type for describing exceptions in the service.
+      type: object
+      properties:
+        status:
+          type: integet
+        message:
+          type: string
+      required:
+        - status
+        - message
+
+    UserFeedbackType:
+      title: User Feedback
+      description: Metadata about a user feedback.
+      type: object
+      properties:
+        id:
+          type: string
+        author:
+          type: string
+        comment:
+          type: string
+        topics:
+          type: array
+          items:
+            type: object
+            properties:
+              name: string
+              rating: number
+      required:
+        - id
+        - author
+        - topics
+      example:
+        id: b0f96597-6473-4104-92f9-a2ac37e33a39
+        author: Gilberto Queiroz
+        comment: |
+          I could reproduce the Knowledge Package ...
+        topics:
+          - name: clarity
+            rating: 4.5
+          - name: usefulness
+            rating: 5
+          - name: reusability
+            rating: 4
+
+  responses:
+    InvalidRecordID:
+      description: Invalid record identifier.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExceptionType'
+
+    InvalidUserFeedbackID:
+      description: Invalid user feedback identifier.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExceptionType'
+
+    InvalidUserID:
+      description: Invalid user identifier.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExceptionType'
+
+    ServerError:
+      description: A JSON document informing that an error has occurred in the system.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExceptionType'
+
+    UserFeedback:
+      description: User's feedback metadata
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserFeedbackType'
+
+
+  parameters:
+
+    feedback_id:
+      name: feedback_id
+      in: path
+      description: Identifier of a user feedback.
+      required: true
+      schema:
+        type: string
+      example: 001db788-3f2f-4505-a77a-d84b843f3b25
+
+    recid:
+      name: recid
+      in: path
+      description: Identifier of a record in InvenioRDM.
+      required: true
+      schema:
+        type: string
+      example: ym60-e8031
+
+    user_id:
+      name: user_id
+      in: path
+      description: Identifier of a user in InvenioRDM.
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+  requestBodies:
