@@ -14,7 +14,7 @@ info:
     url: 'https://opensource.org/licenses/MIT'
   version: '1.0'
   x-logo:
-    url: 'https://geo-knowledge-hub.github.io/_static/logo.png'
+    url: 'https://geo-knowledge-hub.github.io/_static/logo-blue.png'
     altText: GEO Knowledge Hub
     href: 'https://geo-knowledge-hub.github.io'
 
@@ -73,8 +73,10 @@ paths:
         A user moderator can approve or reject a given user feedback.
       operationId: deny_feedback
       responses:
-        '200':
-          $ref: '#/components/responses/UserFeedback'
+        '204':
+          description: The user feedback is rejected.
+        '403':
+          description: The client does not have access rights to deny a user feedback.
         '404':
           $ref: '#/components/responses/InvalidUserFeedbackID'
         '500':
@@ -91,8 +93,10 @@ paths:
         A user moderator can approve or reject a given user feedback.
       operationId: allow_feedback
       responses:
-        '200':
-          $ref: '#/components/responses/UserFeedback'
+        '204':
+          description: The user feedback is accepted.
+        '403':
+          description: The client does not have access rights to accept a user feedback.
         '404':
           $ref: '#/components/responses/InvalidUserFeedbackID'
         '500':
@@ -125,18 +129,43 @@ paths:
         and associate it to the current user.
       operationId: create_feedback
       requestBody:
-        $ref: '#/components/requestBodies/UserFeedback'
+        $ref: '#/components/requestBodies/NewUserFeedback'
       responses:
         '200':
-          $ref: '#/components/responses/UsersFeedback'
+          $ref: '#/components/responses/UserFeedback'
+        '403':
+          description: The client is not authorized to create a user feedback.
         '404':
           $ref: '#/components/responses/InvalidRecordID'
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /user/<user_id>:
+  /search:
     parameters:
-      - $ref: '#/components/parameters/user_id'
+      - name: user_id
+        in: query
+        description: User
+        required: false
+        schema:
+          type: integer
+      - name: is_approved
+        in: query
+        description: Approved Feedbacks
+        required: false
+        schema:
+          type: boolean
+      - name: is_deleted
+        in: query
+        description: A user feedback maked as deleted.
+        required: false
+        schema:
+          type: boolean
+      - name: recid
+        in: query
+        description: Record identifier.
+        required: false
+        schema:
+          type: integer
     get:
       tags:
         - user_feedback
@@ -144,10 +173,12 @@ paths:
       description: |
         Returns an array with all feedback for a given user identifier.
         If none is found, it returns an empty array.
-      operationId: get_user_feedbacks
+      operationId: search_user_feedbacks
       responses:
         '200':
           $ref: '#/components/responses/UsersFeedback'
+        '403':
+          description: The client is not authorized to retrieve users feedback by user id.
         '404':
           $ref: '#/components/responses/InvalidUserID'
         '500':
@@ -161,12 +192,39 @@ components:
       type: object
       properties:
         status:
-          type: integet
+          type: integer
         message:
           type: string
       required:
         - status
         - message
+
+    NewUserFeedbackType:
+      title: New User Feedback
+      description: Metadata about a user feedback.
+      type: object
+      properties:
+        comment:
+          type: string
+        topics:
+          type: array
+          items:
+            type: object
+            properties:
+              name: string
+              rating: number
+      required:
+        - topics
+      example:
+        comment: |
+          I could reproduce the Knowledge Package ...
+        topics:
+          - name: clarity
+            rating: 4.5
+          - name: usefulness
+            rating: 5
+          - name: reusability
+            rating: 4
 
     UserFeedbackType:
       title: User Feedback
@@ -203,6 +261,13 @@ components:
           - name: reusability
             rating: 4
 
+    UsersFeedbackType:
+      title: Users Feedback
+      description: An array of users feedback.
+      type: array
+      items:
+        $ref: '#/components/schemas/UserFeedbackType'
+
   responses:
     InvalidRecordID:
       description: Invalid record identifier.
@@ -233,12 +298,18 @@ components:
             $ref: '#/components/schemas/ExceptionType'
 
     UserFeedback:
-      description: User's feedback metadata
+      description: User's feedback metadata.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/UserFeedbackType'
 
+    UsersFeedback:
+      description: Users feedback metadata.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UsersFeedbackType'
 
   parameters:
 
@@ -270,3 +341,11 @@ components:
       example: 1
 
   requestBodies:
+
+    NewUserFeedback:
+      description: A new user feedback.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewUserFeedbackType'
+      required: true
