@@ -6,11 +6,13 @@
 # GEO Knowledge Hub User's Feedback Component is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
+
 from invenio_db import db
-from invenio_records.api import Record
 from invenio_records.systemfields import SystemFieldsMixin, DictField, ModelField
 
 from .models import UserFeedbackMetadata
+
+from invenio_records_resources.records.api import Record
 
 
 class FeedbackRecordBase(Record, SystemFieldsMixin):
@@ -30,46 +32,44 @@ class FeedbackRecordBase(Record, SystemFieldsMixin):
         raise NotImplementedError("`revision_id` is not available for FeedbackRecord classes.")
 
     @classmethod
-    def get_record(cls, id_, record_id, with_deleted=False, with_denied=False):
+    def get_record(cls, id=None, with_denied=False):
         """Retrieve the record by id.
 
         Raise a database exception if the record does not exist.
 
-        :param id_: feedback ID.
-        :param record_id: record ID.
-        :param with_deleted: If `True` then it includes deleted feedback records.
-        :param with_denied: If `True` then it includes denied feedback records.
-        :returns: The :class:`Record` instance.
+        Args:
+            id (str): Feedback record id
+
+            with_denied (bool): If `True` then it includes denied feedback records.
+
+        Returns:
+            Record: The :class:`Record` instance.
         """
         with db.session.no_autoflush:
             # Searching by the id
-            query = cls.model_cls.query.filter_by(id=id_)
-
-            # Filtering record
-            query = query.filter(cls.model_cls.record_metadata_id == record_id)  # noqa
-
-            if not with_deleted:
-                query = query.filter(cls.model_cls.is_deleted != True)  # noqa
+            query = cls.model_cls.query.filter_by(id=id)
 
             if not with_denied:
-                query = query.filter(cls.model_cls.is_approved != False)  # noqa
+                query = query.filter(cls.model_cls.status != "D")  # noqa
 
             obj = query.one()
             return cls(obj.data, model=obj)
 
     @classmethod
-    def get_records(cls, record_id=None, **kwargs):
+    def get_records(cls, recid=None, **kwargs):
         """Retrieve the record by id.
 
         Raise a database exception if the record does not exist.
 
-        :param record_id:
-        :param kwargs: Query parameters.
+        Args:
+            recid (str): Record (id) associated with the feedbacks.
 
-        :returns: The :class:`Record` instance.
+            kwargs (dict): Query params.
+        Returns:
+            List: List of retrieved records.
         """
         # filtering invalid parameters
-        valid_query_parameters = ["id", "is_approved", "is_deleted", "user_id", "record_id"]
+        valid_query_parameters = ["id", "status", "user_id"]
         query_arguments = {k: v for k, v in kwargs.items() if v is not None and k in valid_query_parameters}
 
         with db.session.no_autoflush:
@@ -77,8 +77,8 @@ class FeedbackRecordBase(Record, SystemFieldsMixin):
             query = cls.model_cls.query.filter_by(**query_arguments)
 
             # Filtering record
-            if record_id:
-                query = query.filter(cls.model_cls.record_metadata_id == record_id)  # noqa
+            if recid:
+                query = query.filter(cls.model_cls.record_metadata_id == recid)  # noqa
 
             objs = query.all()
             return [cls(obj.data, model=obj) for obj in objs]
@@ -88,12 +88,8 @@ class FeedbackRecord(FeedbackRecordBase):
     model_cls = UserFeedbackMetadata
 
     #
-    # Model fields
+    # Relation fields
     #
-    json = DictField(clear_none=True, create_if_missing=True)
-
-    is_approved = ModelField(dump=False)
-
     user = ModelField()
     user_id = ModelField()
 
@@ -103,8 +99,10 @@ class FeedbackRecord(FeedbackRecordBase):
     #
     # Comment fields
     #
-    text = DictField("comment")
-    categories = DictField("categories")
+    status = ModelField()
+
+    topics = DictField("topics")
+    comment = DictField("comment")
 
     #
     # Schema (ToDo)
@@ -114,13 +112,10 @@ class FeedbackRecord(FeedbackRecordBase):
     def to_dict(self):
         return {
             "id": self.id,
-            "author": {
-                "fullname": self.user.profile.full_name,
-                "email": self.user.email
-            },
-            "is_approved": self.is_approved,
-            "is_deleted": self.is_deleted,
-            **(self.json or {})
+            "status": self.status,
+            "author": self.user.profile.full_name,
+            "topics": self.topics,
+            "comment": self.comment
         }
 
 

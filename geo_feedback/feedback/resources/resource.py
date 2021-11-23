@@ -14,9 +14,11 @@ from flask_resources import (
     Resource, route, response_handler, resource_requestctx
 )
 
+from invenio_records_resources.resources.errors import ErrorHandlersMixin
+
 from .parser import request_view_args, request_data, request_search_args
 
-from invenio_records_resources.resources.errors import ErrorHandlersMixin
+from ..records.models import FeedbackStatus
 
 
 class UserFeedbackResource(ErrorHandlersMixin, Resource):
@@ -40,7 +42,7 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
             route("GET", routes["search-item"], self.search_feedback),
 
             route("POST", routes["deny-item"], self.deny_feedback),
-            route("POST", routes["approve-item"], self.approve_feedback)
+            route("POST", routes["allow-item"], self.allow_feedback)
         ]
 
     @request_data
@@ -49,7 +51,7 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
     def create_feedback(self):
         created_feedback = self.service.create_feedback(
             g.identity,
-            resource_requestctx.view_args["pid_value"],
+            resource_requestctx.view_args["recid"],
             resource_requestctx.data,
             auto_approve=current_app.config.get("GEO_FEEDBACK_AUTO_APPROVE", False)
         )
@@ -61,7 +63,6 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
     def get_feedback(self):
         selected_feedback = self.service.get_feedback(
             g.identity,
-            resource_requestctx.view_args["pid_value"],
             resource_requestctx.view_args["feedback_id"]
         )
 
@@ -73,7 +74,6 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
     def edit_feedback(self):
         feedback_edited = self.service.edit_feedback(
             g.identity,
-            resource_requestctx.view_args["pid_value"],
             resource_requestctx.view_args["feedback_id"],
             resource_requestctx.data
         )
@@ -85,9 +85,9 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
     def list_feedback_by_record(self):
         selected_feedbacks = self.service.list_record_feedback(
             g.identity,
+            status=FeedbackStatus.ALLOWED.value,
             is_deleted=False,
-            is_approved=True,
-            pid_value=resource_requestctx.view_args["pid_value"]
+            recid=resource_requestctx.view_args["recid"]
         )
 
         return [sfeedback.to_dict() for sfeedback in selected_feedbacks], 200
@@ -104,7 +104,6 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
     def delete_feedback(self):
         self.service.delete_feedback(
             g.identity,
-            resource_requestctx.view_args["pid_value"],
             resource_requestctx.view_args["feedback_id"]
         )
 
@@ -114,21 +113,19 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
     def deny_feedback(self):
         denied_feedback = self.service.deny_feedback(
             g.identity,
-            resource_requestctx.view_args["pid_value"],
             resource_requestctx.view_args["feedback_id"]
         )
 
         return denied_feedback.to_dict(), 200
 
     @request_view_args
-    def approve_feedback(self):
-        approved_feedback = self.service.approve_feedback(
+    def allow_feedback(self):
+        allowed_feedback = self.service.allow_feedback(
             g.identity,
-            resource_requestctx.view_args["pid_value"],
             resource_requestctx.view_args["feedback_id"]
         )
 
-        return approved_feedback.to_dict(), 200
+        return allowed_feedback.to_dict(), 200
 
 
 __all__ = (

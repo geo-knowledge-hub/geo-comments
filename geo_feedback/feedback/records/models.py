@@ -11,32 +11,33 @@
 
 import uuid
 
+from enum import Enum
+
 from invenio_db import db
 from invenio_records.models import RecordMetadataBase
 
-from sqlalchemy import UniqueConstraint
-from sqlalchemy_json import mutable_json_type
-
 from sqlalchemy_utils.types import UUIDType
-from sqlalchemy.dialects.postgresql import JSONB
 
 from invenio_accounts.models import User as InvenioUser
 from invenio_rdm_records.records.models import RDMRecordMetadata as InvenioRecordMetadata
 
 
+class FeedbackStatus(Enum):
+    ALLOWED = "A"
+    DENIED = "D"
+
+
 class UserFeedbackMetadata(db.Model, RecordMetadataBase):
     """Represent a user feedback record."""
-    __tablename__ = "users_feedback"
+    __tablename__ = "feedbacks_user_feedback"
 
     id = db.Column(
         UUIDType,
         primary_key=True,
         default=uuid.uuid4,
     )
-    """Record identifier."""
 
-    is_approved = db.Column(db.Boolean, nullable=False, default=False)
-    json = db.Column(mutable_json_type(dbtype=JSONB(none_as_null=True), nested=True), nullable=True)
+    status = db.Column(db.String, default=FeedbackStatus.DENIED.value)  # A(llowed) or D(enied)
 
     user_id = db.Column(db.Integer, db.ForeignKey(InvenioUser.id))
     user = db.relationship(InvenioUser)
@@ -44,12 +45,14 @@ class UserFeedbackMetadata(db.Model, RecordMetadataBase):
     record_metadata_id = db.Column(UUIDType, db.ForeignKey(InvenioRecordMetadata.id))
     record_metadata = db.relationship(InvenioRecordMetadata)
 
-    UniqueConstraint("user_id", "record_metadata_id")
-
     version_id = None
     __mapper_args__ = {}
 
+    __table_args__ = (db.UniqueConstraint("user_id", "record_metadata_id"),)
+
 
 __all__ = (
+    "FeedbackStatus",
+
     "UserFeedbackMetadata"
 )

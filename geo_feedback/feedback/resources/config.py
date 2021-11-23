@@ -9,16 +9,35 @@
 
 
 import marshmallow as ma
-from flask_resources import ResourceConfig, ResponseHandler, JSONSerializer, RequestBodyParser, JSONDeserializer
+from flask_resources import (
+    ResourceConfig,
+    ResponseHandler,
+    JSONSerializer,
+    RequestBodyParser,
+    JSONDeserializer,
+    HTTPJSONException,
+    create_error_handler
+)
+
+from sqlalchemy.exc import IntegrityError
+
+feedback_error_handlers = {
+    IntegrityError: create_error_handler(
+        HTTPJSONException(
+            code=409,
+            description="User have already created feedback for this record."
+        )
+    )
+}
 
 
 class UserFeedbackResourceConfig(ResourceConfig):
-    url_prefix = "/feedback"
+    url_prefix = "/feedbacks"
     blueprint_name = "geo_feedback"
 
     request_view_args = {
-        "feedback_id": ma.fields.String(),
-        "pid_value": ma.fields.String()
+        "feedback_id": ma.fields.UUID(),
+        "recid": ma.fields.String()
     }
 
     request_search_args = {
@@ -27,24 +46,23 @@ class UserFeedbackResourceConfig(ResourceConfig):
         "user_id": ma.fields.Int(),
 
         # status
-        "is_approved": ma.fields.Bool(),
-        "is_deleted": ma.fields.Bool(),
+        "status": ma.fields.Str(),
 
-        "record_id": ma.fields.String()
+        "recid": ma.fields.String()
     }
 
     routes = {
         # General routes
-        "list-item": "/<pid_value>",  # only approved feedbacks
-        "create-item": "/<pid_value>",
-        "get-item": "/<pid_value>/<feedback_id>",
-        "update-item": "/<pid_value>/<feedback_id>",
-        "delete-item": "/<pid_value>/<feedback_id>",
+        "list-item": "/records/<recid>",  # only approved feedbacks
+        "create-item": "/records/<recid>",
+        "get-item": "/<feedback_id>",
+        "update-item": "/<feedback_id>",
+        "delete-item": "/<feedback_id>",
 
         # Admin routes
         "search-item": "",  # feedbacks from all records (approved and denied)
-        "deny-item": "/<pid_value>/<feedback_id>/actions/deny",
-        "approve-item": "/<pid_value>/<feedback_id>/actions/approve"
+        "deny-item": "/<feedback_id>/actions/deny",
+        "allow-item": "/<feedback_id>/actions/allow"
     }
 
     # Request parsing
@@ -64,6 +82,8 @@ class UserFeedbackResourceConfig(ResourceConfig):
 
     default_content_type = "application/json"
     default_accept_mimetype = "application/json"
+
+    error_handlers = feedback_error_handlers
 
 
 __all__ = (
