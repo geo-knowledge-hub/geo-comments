@@ -5,16 +5,15 @@
 # geo-feedback is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-from flask_babelex import gettext as _
-from marshmallow import ValidationError
-
 from invenio_records_resources.services.records.components import \
     ServiceComponent as BaseServiceComponent
+
+from ..records.models import FeedbackStatus
 
 
 class UserFeedbackComponentBase(BaseServiceComponent):
 
-    def change_feedback_state(self, identity, feedback=None, record=None, state=None, **kwargs):
+    def change_feedback_state(self, identity, feedback=None, state=None, **kwargs):
         pass
 
     def create_feedback(self, identity, feedback=None, data=None, record=None, **kwargs):
@@ -31,7 +30,7 @@ class UserFeedbackMetadata(UserFeedbackComponentBase):
 
     def create_feedback(self, identity, feedback=None, data=None, record=None, **kwargs):
         # Adding data
-        feedback.json = data
+        feedback.update(data)
 
         feedback.user_id = identity.user.id
         feedback.record_metadata_id = record.id
@@ -39,24 +38,15 @@ class UserFeedbackMetadata(UserFeedbackComponentBase):
         # checking auto approve
         auto_approve = kwargs.get("auto_approve", False)
         if auto_approve:
-            feedback.is_approved = True
+            feedback.status = FeedbackStatus.ALLOWED.value
 
     def edit_feedback(self, identity, feedback=None, data=None):
-        feedback.json = data
+        feedback.update(data)
 
-
-class UserFeedbackMetadataIntegrity(UserFeedbackComponentBase):
-
-    def create_feedback(self, identity, feedback=None, data=None, record=None, **kwargs):
-        records = feedback.get_records(record_id=record.id, user_id=identity.user.id)
-
-        if records:
-            raise ValidationError(
-                _("The user has already registered feedback on this record.")
-            )
+    def change_feedback_state(self, identity, feedback=None, state=None, data=None, **kwargs):
+        feedback.status = data.value
 
 
 __all__ = (
-    "UserFeedbackMetadata",
-    "UserFeedbackMetadataIntegrity"
+    "UserFeedbackMetadata"
 )

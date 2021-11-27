@@ -16,22 +16,16 @@ class FeedbackCategorySchema(Schema):
     rating = fields.Float(required=True)
 
 
-class FeedbackAuthorField(fields.Field):
-    email = fields.String(required=True)
-    fullname = fields.String(required=True)
-
-
 class FeedbackSchema(Schema):
     id = fields.Integer(dump_only=True)
 
     comment = fields.String(required=True)
-    categories = fields.List(cls_or_instance=fields.Nested(FeedbackCategorySchema()), required=True)
+    topics = fields.List(cls_or_instance=fields.Nested(FeedbackCategorySchema()), required=True)
 
-    author = FeedbackAuthorField(dump_only=True)
+    author = fields.String(dump_only=True)
 
 
 __all__ = (
     "FeedbackSchema",
-    "FeedbackAuthorField",
     "FeedbackCategorySchema"
 )

@@ -42,13 +42,11 @@ extras_require = {
 extras_require['all'] = [req for _, reqs in extras_require.items() for req in reqs]
 
 setup_requires = [
-    'Babel>=2.8',
 ]
 
 install_requires = [
     'invenio-i18n>=1.2.0',
-    'invenio-rdm-records>=0.32.3,<0.33.0',
-    'sqlalchemy-json>=0.4.0'
+    'invenio-rdm-records>=0.32.3,<0.33.0'
 ]
 
 packages = find_packages()

@@ -9,8 +9,6 @@
 
 """Feedback module for GEO Knowledge Hub"""
 
-from flask_babelex import gettext as _
-
 from . import config
 from .feedback.resources.config import UserFeedbackResourceConfig
 from .feedback.resources.resource import UserFeedbackResource
