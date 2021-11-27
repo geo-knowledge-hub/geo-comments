@@ -11,14 +11,20 @@
 from flask import g, current_app
 
 from flask_resources import (
-    Resource, route, response_handler, resource_requestctx
+    route,
+    response_handler,
+    resource_requestctx,
+    Resource
 )
 
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
 
-from .parser import request_view_args, request_data, request_search_args
-
-from ..records.models import FeedbackStatus
+from .parser import (
+    request_data,
+    request_record_args,
+    request_search_args,
+    request_feedback_args
+)
 
 
 class UserFeedbackResource(ErrorHandlersMixin, Resource):
@@ -32,67 +38,29 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
         routes = self.config.routes
         return [
             # General routes
-            route("GET", routes["get-item"], self.get_feedback),
-            route("PUT", routes["update-item"], self.edit_feedback),
-            route("POST", routes["create-item"], self.create_feedback),
-            route("DELETE", routes["delete-item"], self.delete_feedback),
-            route("GET", routes["list-item"], self.list_feedback_by_record),
+            route("GET", routes["base"], self.search_feedback),
+            route("PUT", routes["base"], self.update_feedback),
+            route("POST", routes["base"], self.create_feedback),
+            route("DELETE", routes["base"], self.delete_feedback),
 
             # Admin routes
-            route("GET", routes["search-item"], self.search_feedback),
-
             route("POST", routes["deny-item"], self.deny_feedback),
             route("POST", routes["allow-item"], self.allow_feedback)
         ]
 
     @request_data
-    @request_view_args
+    @request_record_args
     @response_handler()
     def create_feedback(self):
         created_feedback = self.service.create_feedback(
             g.identity,
-            resource_requestctx.view_args["recid"],
+            resource_requestctx.args["recid"],
             resource_requestctx.data,
             auto_approve=current_app.config.get("GEO_FEEDBACK_AUTO_APPROVE", False)
         )
 
         return created_feedback.to_dict(), 201
 
-    @request_view_args
-    @response_handler()
-    def get_feedback(self):
-        selected_feedback = self.service.get_feedback(
-            g.identity,
-            resource_requestctx.view_args["feedback_id"]
-        )
-
-        return selected_feedback.to_dict(), 200
-
-    @request_data
-    @request_view_args
-    @response_handler()
-    def edit_feedback(self):
-        feedback_edited = self.service.edit_feedback(
-            g.identity,
-            resource_requestctx.view_args["feedback_id"],
-            resource_requestctx.data
-        )
-
-        return feedback_edited.to_dict(), 200
-
-    @request_view_args
-    @response_handler(many=True)
-    def list_feedback_by_record(self):
-        selected_feedbacks = self.service.list_record_feedback(
-            g.identity,
-            status=FeedbackStatus.ALLOWED.value,
-            is_deleted=False,
-            recid=resource_requestctx.view_args["recid"]
-        )
-
-        return [sfeedback.to_dict() for sfeedback in selected_feedbacks], 200
-
-    @request_view_args
     @request_search_args
     @response_handler(many=True)
     def search_feedback(self):
@@ -100,29 +68,41 @@ class UserFeedbackResource(ErrorHandlersMixin, Resource):
 
         return [sfeedback.to_dict() for sfeedback in selected_feedbacks], 200
 
-    @request_view_args
+    @request_data
+    @request_feedback_args
+    @response_handler()
+    def update_feedback(self):
+        feedback_edited = self.service.edit_feedback(
+            g.identity,
+            resource_requestctx.args["id"],
+            resource_requestctx.data
+        )
+
+        return feedback_edited.to_dict(), 200
+
+    @request_feedback_args
     def delete_feedback(self):
         self.service.delete_feedback(
             g.identity,
-            resource_requestctx.view_args["feedback_id"]
+            resource_requestctx.args["id"]
         )
 
         return '', 204
 
-    @request_view_args
+    @request_feedback_args
     def deny_feedback(self):
         denied_feedback = self.service.deny_feedback(
             g.identity,
-            resource_requestctx.view_args["feedback_id"]
+            resource_requestctx.args["id"]
         )
 
         return denied_feedback.to_dict(), 200
 
-    @request_view_args
+    @request_feedback_args
     def allow_feedback(self):
         allowed_feedback = self.service.allow_feedback(
             g.identity,
-            resource_requestctx.view_args["feedback_id"]
+            resource_requestctx.args["id"]
         )
 
         return allowed_feedback.to_dict(), 200
