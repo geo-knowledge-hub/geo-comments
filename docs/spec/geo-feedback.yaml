@@ -26,103 +26,17 @@ servers:
 
 paths:
 
-  /{feedback_id}:
-    parameters:
-      - $ref: '#/components/parameters/feedback_id'
-    get:
-      tags:
-        - feedback
-      summary: Returns the metadata of a given user feedback.
-      description: |
-        Returns a given user feedback metadata without
-        sensitive fields.
-      operationId: get_feedback
-      responses:
-        '200':
-          $ref: '#/components/responses/UserFeedback'
-        '404':
-          $ref: '#/components/responses/InvalidUserFeedbackID'
-        '500':
-          $ref: '#/components/responses/ServerError'
-    delete:
-      tags:
-        - feedback
-      summary: Mark the user feedback as deleted.
-      description: |
-        Mark the given user feedback as deleted.
-        No actual deletion is performed. Only
-        feedbacks owned by the current user or
-        moderator can be marked as deleted.
-      operationId: remove_feedback
-      responses:
-        '204':
-          description: The user feedback was deleted.
-        '403':
-          description: The client does not have access rights to delete the feedback.
-        '404':
-          $ref: '#/components/responses/InvalidUserFeedbackID'
+  /feedbacks:
 
-  /{feedback_id}/actions/deny:
-    parameters:
-      - $ref: '#/components/parameters/feedback_id'
     post:
+      parameters:
+        - name: recid
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/parameters/recid'
       tags:
-        - feedback
-      summary: Mark the user feedback as invalid.
-      description: |
-        A user moderator can approve or reject a given user feedback.
-      operationId: deny_feedback
-      responses:
-        '204':
-          description: The user feedback is rejected.
-        '403':
-          description: The client does not have access rights to deny a user feedback.
-        '404':
-          $ref: '#/components/responses/InvalidUserFeedbackID'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /{feedback_id}/actions/allow:
-    parameters:
-      - $ref: '#/components/parameters/feedback_id'
-    post:
-      tags:
-        - feedback
-      summary: Mark the user feedback as valid.
-      description: |
-        A user moderator can approve or reject a given user feedback.
-      operationId: allow_feedback
-      responses:
-        '204':
-          description: The user feedback is accepted.
-        '403':
-          description: The client does not have access rights to accept a user feedback.
-        '404':
-          $ref: '#/components/responses/InvalidUserFeedbackID'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /record/{recid}:
-    parameters:
-      - $ref: '#/components/parameters/recid'
-    get:
-      tags:
-        - feedback
-      summary: Returns all users feedback for a given record.
-      description: |
-        Returns an array with all users feedback for a given record identifier.
-        If none is found, it returns an empty array.
-      operationId: get_record_feedbacks
-      responses:
-        '200':
-          $ref: '#/components/responses/UsersFeedback'
-        '404':
-          $ref: '#/components/responses/InvalidRecordID'
-        '500':
-          $ref: '#/components/responses/ServerError'
-    post:
-      tags:
-        - feedback
+        - User Feedback
       summary: Create a new user feedback for a given InvenioRDM record.
       description: |
         Creates a new user feedback for a given InvenioRDM record
@@ -140,47 +54,123 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /search:
-    parameters:
-      - name: user_id
-        in: query
-        description: User
-        required: false
-        schema:
-          type: integer
-      - name: is_approved
-        in: query
-        description: Approved Feedbacks
-        required: false
-        schema:
-          type: boolean
-      - name: is_deleted
-        in: query
-        description: A user feedback maked as deleted.
-        required: false
-        schema:
-          type: boolean
-      - name: recid
-        in: query
-        description: Record identifier.
-        required: false
-        schema:
-          type: integer
     get:
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/recid'
+        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/is_approved'
+        - $ref: '#/components/parameters/is_deleted'
       tags:
-        - user_feedback
-      summary: Returns all feedbacks provided by a given user.
+        - User Feedback
+      summary: Returns the metadata of a given user feedback.
       description: |
-        Returns an array with all feedback for a given user identifier.
-        If none is found, it returns an empty array.
-      operationId: search_user_feedbacks
+        Returns a given user feedback metadata without
+        sensitive fields.
+      operationId: get_feedback
       responses:
         '200':
-          $ref: '#/components/responses/UsersFeedback'
-        '403':
-          description: The client is not authorized to retrieve users feedback by user id.
+          $ref: '#/components/responses/UserFeedback'
         '404':
-          $ref: '#/components/responses/InvalidUserID'
+          $ref: '#/components/responses/InvalidUserFeedbackID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+
+    put:
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/parameters/id'
+      tags:
+        - User Feedback
+      summary: Updates an existing user feedback.
+      description: |
+        Updates a an already existing user feedback for a given InvenioRDM record.
+      operationId: update_feedback
+      requestBody:
+        $ref: '#/components/requestBodies/NewUserFeedback'
+      responses:
+        '200':
+          $ref: '#/components/responses/UserFeedback'
+        '403':
+          description: The client is not authorized to create a user feedback.
+        '404':
+          $ref: '#/components/responses/InvalidRecordID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/parameters/id'
+      tags:
+        - User Feedback
+      summary: Mark the user feedback as deleted.
+      description: |
+        Mark the given user feedback as deleted.
+        No actual deletion is performed. Only
+        feedbacks owned by the current user or
+        moderator can be marked as deleted.
+      operationId: remove_feedback
+      responses:
+        '204':
+          description: The user feedback was deleted.
+        '403':
+          description: The client does not have access rights to delete the feedback.
+        '404':
+          $ref: '#/components/responses/InvalidUserFeedbackID'
+
+  /feedbacks/actions/deny:
+    post:
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/parameters/id'
+      tags:
+        - User Feedback
+      summary: Mark the user feedback as invalid.
+      description: |
+        A user moderator can approve or reject a given user feedback.
+      operationId: deny_feedback
+      responses:
+        '204':
+          description: The user feedback is rejected.
+        '403':
+          description: The client does not have access rights to deny a user feedback.
+        '404':
+          $ref: '#/components/responses/InvalidUserFeedbackID'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /feedbacks/actions/allow:
+    post:
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/parameters/id'
+      tags:
+        - User Feedback
+      summary: Mark the user feedback as valid.
+      description: |
+        A user moderator can approve or reject a given user feedback.
+      operationId: allow_feedback
+      responses:
+        '204':
+          description: The user feedback is accepted.
+        '403':
+          description: The client does not have access rights to accept a user feedback.
+        '404':
+          $ref: '#/components/responses/InvalidUserFeedbackID'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -211,8 +201,10 @@ components:
           items:
             type: object
             properties:
-              name: string
-              rating: number
+              name:
+                type: string
+              rating:
+                type: number
       required:
         - topics
       example:
@@ -244,8 +236,10 @@ components:
           items:
             type: object
             properties:
-              name: string
-              rating: number
+              name:
+                type: string
+              rating:
+                type: number
       required:
         - id
         - author
@@ -315,32 +309,48 @@ components:
 
   parameters:
 
-    feedback_id:
-      name: feedback_id
-      in: path
+    id:
+      name: id
+      in: query
       description: Identifier of a user feedback.
-      required: true
+      required: false
       schema:
         type: string
       example: 001db788-3f2f-4505-a77a-d84b843f3b25
 
     recid:
       name: recid
-      in: path
+      in: query
       description: Identifier of a record in InvenioRDM.
-      required: true
+      required: false
       schema:
         type: string
       example: ym60-e8031
 
     user_id:
       name: user_id
-      in: path
+      in: query
       description: Identifier of a user in InvenioRDM.
-      required: true
+      required: false
       schema:
         type: integer
       example: 1
+
+    is_approved:
+      name: is_approved
+      in: query
+      description: Approved Feedbacks
+      required: false
+      schema:
+        type: boolean
+
+    is_deleted:
+      name: is_deleted
+      in: query
+      description: A user feedback maked as deleted.
+      required: false
+      schema:
+        type: boolean
 
   requestBodies:
 
