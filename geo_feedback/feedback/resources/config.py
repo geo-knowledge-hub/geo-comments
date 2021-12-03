@@ -35,9 +35,12 @@ class UserFeedbackResourceConfig(ResourceConfig):
     url_prefix = "/feedbacks"
     blueprint_name = "geo_feedback"
 
-    request_view_args = {
-        "feedback_id": ma.fields.UUID(),
-        "recid": ma.fields.String()
+    request_record_args = {
+        "recid": ma.fields.String(required=True)
+    }
+
+    request_feedback_args = {
+        "id": ma.fields.String(required=True)
     }
 
     request_search_args = {
@@ -53,21 +56,11 @@ class UserFeedbackResourceConfig(ResourceConfig):
 
     routes = {
         # General routes
-        "list-item": "/records/<recid>",  # only approved feedbacks
-        "create-item": "/records/<recid>",
-        "get-item": "/<feedback_id>",
-        "update-item": "/<feedback_id>",
-        "delete-item": "/<feedback_id>",
+        "base": "",
 
         # Admin routes
-        "search-item": "",  # feedbacks from all records (approved and denied)
-        "deny-item": "/<feedback_id>/actions/deny",
-        "allow-item": "/<feedback_id>/actions/allow"
-    }
-
-    # Request parsing
-    request_headers = {
-        "if_match": ma.fields.Int()
+        "deny-item": "/actions/deny",
+        "allow-item": "/actions/allow"
     }
 
     request_body_parsers = {

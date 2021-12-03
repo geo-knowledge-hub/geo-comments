@@ -14,8 +14,12 @@ request_data = request_body_parser(
     default_content_type=from_conf("default_content_type")
 )
 
-request_view_args = request_parser(
-    from_conf("request_view_args"), location="view_args"
+request_feedback_args = request_parser(
+    from_conf("request_feedback_args"), location="args"
+)
+
+request_record_args = request_parser(
+    from_conf("request_record_args"), location="args"
 )
 
 request_search_args = request_parser(
@@ -24,6 +28,7 @@ request_search_args = request_parser(
 
 __all__ = (
     "request_data",
-    "request_view_args",
-    "request_search_args"
+    "request_search_args",
+    "request_record_args",
+    "request_feedback_args"
 )

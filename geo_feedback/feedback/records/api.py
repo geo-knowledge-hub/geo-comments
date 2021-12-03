@@ -115,7 +115,9 @@ class FeedbackRecord(FeedbackRecordBase):
             "status": self.status,
             "author": self.user.profile.full_name,
             "topics": self.topics,
-            "comment": self.comment
+            "comment": self.comment,
+            "created": self.created,
+            "updated": self.updated
         }
 
 
