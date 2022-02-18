@@ -15,7 +15,7 @@ theme = WebpackThemeBundle(
     themes={
         "semantic-ui": dict(
             entry={
-                "geo-feedback": "./js/geo-feedback/index.js"
+                "geo_feedback": "./js/geo-feedback/index.js"
             }
         )
     }

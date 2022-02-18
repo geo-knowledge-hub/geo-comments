@@ -15,8 +15,3 @@ def create_feedback_api_blueprint(app):
     ext = app.extensions["geo-feedback"]
 
     return ext.feedback_resource.as_blueprint()
-
-
-__all__ = (
-    "create_feedback_api_blueprint"
-)

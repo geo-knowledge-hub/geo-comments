@@ -4,12 +4,8 @@
 // GEO Feedback is free software; you can redistribute it and/or modify it
 // under the terms of the MIT License; see LICENSE file for more details.
 
-import React from "react";
-import ReactDOM from "react-dom";
+// Buttons
+export * from "./button";
 
-import { UserFeedbackApp } from "./UserFeedbackApp"
-
-ReactDOM.render(
-  <UserFeedbackApp />,
-  document.getElementById("feedback-component")
-);
+// Modals
+export { FeedbackModal } from "./FeedbackModal";
