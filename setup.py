@@ -87,8 +87,11 @@ setup(
         'invenio_assets.webpack': [
             'geo_feedback = geo_feedback.theme.webpack:theme'
         ],
+        "invenio_base.blueprints": [
+            "geo_feedback = geo_feedback.views.page:blueprint",
+        ],
         'invenio_base.api_blueprints': [
-            'geo_feedback = geo_feedback.views:create_feedback_api_blueprint',
+            'geo_feedback = geo_feedback.views.api:create_feedback_api_blueprint',
         ],
         'invenio_i18n.translations': [
             'messages = geo_feedback',
