@@ -8,46 +8,33 @@
 #
 
 from invenio_db import db
-from invenio_records.systemfields import SystemFieldsMixin, DictField, ModelField
 
-from .models import UserFeedbackMetadata
+from invenio_records.systemfields import (
+    SystemFieldsMixin,
+    DictField,
+    ModelField,
+    ConstantField,
+)
 
 from invenio_records_resources.records.api import Record
+from invenio_records_resources.records.systemfields import IndexField
+
+from geo_feedback.feedback.records.models import FeedbackModel
+from geo_feedback.feedback.records.systemfields.fields.entity import EntityField
+from geo_feedback.feedback.records.systemfields.models import RecordEntity, UserEntity
 
 
-class FeedbackRecordBase(Record, SystemFieldsMixin):
-
-    def revert(self, revision_id):
-        """Revert the record to a specific revision."""
-        raise NotImplementedError("`revert` is not available for FeedbackRecord classes.")
-
-    @property
-    def revisions(self):
-        """Get revisions iterator."""
-        raise NotImplementedError("`revisions` is not available for FeedbackRecord classes.")
-
-    @property
-    def revision_id(self):
-        """Get revision identifier."""
-        raise NotImplementedError("`revision_id` is not available for FeedbackRecord classes.")
+class FeedbackRecordBase(Record):
+    """Base for Feedback record High-level API."""
 
     @classmethod
-    def get_record(cls, id=None, with_denied=False):
-        """Retrieve the record by id.
-
-        Raise a database exception if the record does not exist.
-
-        Args:
-            id (str): Feedback record id
-
-            with_denied (bool): If `True` then it includes denied feedback records.
-
-        Returns:
-            Record: The :class:`Record` instance.
-        """
+    def get_record(cls, id_, with_deleted=False, with_denied=False):
+        """Retrieve the record by id."""
         with db.session.no_autoflush:
-            # Searching by the id
-            query = cls.model_cls.query.filter_by(id=id)
+            query = cls.model_cls.query.filter_by(id=id_)
+
+            if not with_deleted:
+                query = query.filter(cls.model_cls.is_deleted != True)  # noqa
 
             if not with_denied:
                 query = query.filter(cls.model_cls.status != "D")  # noqa
@@ -56,71 +43,40 @@ class FeedbackRecordBase(Record, SystemFieldsMixin):
             return cls(obj.data, model=obj)
 
     @classmethod
-    def get_records(cls, recid=None, **kwargs):
-        """Retrieve the record by id.
-
-        Raise a database exception if the record does not exist.
-
-        Args:
-            recid (str): Record (id) associated with the feedbacks.
-
-            kwargs (dict): Query params.
-        Returns:
-            List: List of retrieved records.
-        """
-        # filtering invalid parameters
-        valid_query_parameters = ["id", "status", "user_id"]
-        query_arguments = {k: v for k, v in kwargs.items() if v is not None and k in valid_query_parameters}
-
+    def get_records(cls, ids, with_deleted=False, with_denied=False):
+        """Retrieve multiple records by id."""
         with db.session.no_autoflush:
-            # Searching by the id
-            query = cls.model_cls.query.filter_by(**query_arguments)
+            query = cls.model_cls.query.filter(cls.model_cls.id.in_(ids))
 
-            # Filtering record
-            if recid:
-                query = query.filter(cls.model_cls.record_metadata_id == recid)  # noqa
+            if not with_deleted:
+                query = query.filter(cls.model_cls.is_deleted != True)  # noqa
 
-            objs = query.all()
-            return [cls(obj.data, model=obj) for obj in objs]
+            if not with_denied:
+                query = query.filter(cls.model_cls.status != "D")  # noqa
+
+            return [cls(obj.data, model=obj) for obj in query.all()]
 
 
-class FeedbackRecord(FeedbackRecordBase):
-    model_cls = UserFeedbackMetadata
-
-    #
-    # Relation fields
-    #
-    user = ModelField()
-    user_id = ModelField()
-
-    record_metadata = ModelField()
-    record_metadata_id = ModelField()
+class FeedbackRecord(FeedbackRecordBase, SystemFieldsMixin):
+    """Feedback High-level API."""
 
     #
-    # Comment fields
+    # System fields
     #
-    status = ModelField()
+    schema = ConstantField("$schema", "local://feedback/feedback-v1.0.0.json")
+
+    # Feedback
+    id = ModelField("id")
+
+    status = ModelField("status")
 
     topics = DictField("topics")
     comment = DictField("comment")
 
-    #
-    # Schema (ToDo)
-    #
-    # schema = ConstantField("$schema", "local://...")
+    # Relations
+    user = EntityField(key="user_id", entity_obj_class=UserEntity)
+    record = EntityField(key="record_id", entity_obj_class=RecordEntity)
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "status": self.status,
-            "author": self.user.profile.full_name,
-            "topics": self.topics,
-            "comment": self.comment,
-            "created": self.created,
-            "updated": self.updated
-        }
-
-
-__all__ = (
-    "FeedbackRecord"
-)
+    # Database model and Index
+    model_cls = FeedbackModel
+    index = IndexField("feedback-feedback-v1.0.0", search_alias="feedback")

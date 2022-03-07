@@ -9,8 +9,6 @@
 
 """Data model for GEO Knowledge Hub User's Feedback Component."""
 
-import uuid
-
 from enum import Enum
 
 from invenio_db import db
@@ -19,40 +17,44 @@ from invenio_records.models import RecordMetadataBase
 from sqlalchemy_utils.types import UUIDType
 
 from invenio_accounts.models import User as InvenioUser
-from invenio_rdm_records.records.models import RDMRecordMetadata as InvenioRecordMetadata
+from invenio_rdm_records.records.models import (
+    RDMRecordMetadata as InvenioRecordMetadata,
+)
 
 
 class FeedbackStatus(Enum):
+    """Feedback status enum.
+
+    Allowed: The feedback is approved and can be presented for the users;
+    Denied: The feedback is denied and can't be presented for the users.
+    """
+
     ALLOWED = "A"
     DENIED = "D"
 
 
-class UserFeedbackMetadata(db.Model, RecordMetadataBase):
-    """Represent a user feedback record."""
-    __tablename__ = "feedbacks_user_feedback"
+class FeedbackModel(db.Model, RecordMetadataBase):
+    """Feedback model class."""
 
-    id = db.Column(
-        UUIDType,
-        primary_key=True,
-        default=uuid.uuid4,
-    )
+    __tablename__ = "feedbacks_feedback"
 
-    status = db.Column(db.String, default=FeedbackStatus.DENIED.value)  # A(llowed) or D(enied)
-
+    #
+    # Users
+    #
     user_id = db.Column(db.Integer, db.ForeignKey(InvenioUser.id))
     user = db.relationship(InvenioUser)
 
-    record_metadata_id = db.Column(UUIDType, db.ForeignKey(InvenioRecordMetadata.id))
-    record_metadata = db.relationship(InvenioRecordMetadata)
+    #
+    # Records
+    #
+    record_id = db.Column(UUIDType, db.ForeignKey(InvenioRecordMetadata.id))
+    record = db.relationship(InvenioRecordMetadata)
 
-    version_id = None
-    __mapper_args__ = {}
+    #
+    # Feedback
+    #
+    status = db.Column(
+        db.String, default=FeedbackStatus.DENIED.value
+    )  # A(llowed) or D(enied)
 
-    __table_args__ = (db.UniqueConstraint("user_id", "record_metadata_id"),)
-
-
-__all__ = (
-    "FeedbackStatus",
-
-    "UserFeedbackMetadata"
-)
+    __table_args__ = (db.UniqueConstraint("user_id", "record_id"),)

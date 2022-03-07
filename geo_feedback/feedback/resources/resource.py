@@ -7,107 +7,129 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-
 from flask import g, current_app
-
 from flask_resources import (
     route,
     response_handler,
     resource_requestctx,
-    Resource
+    create_error_handler,
+    Resource,
+    HTTPJSONException,
 )
+
+from sqlalchemy.exc import IntegrityError
 
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
+from invenio_records_resources.resources.records.utils import es_preference
 
-from .parser import (
+
+from geo_feedback.feedback.resources.parser import (
     request_data,
+    request_headers,
+    request_read_args,
     request_record_args,
     request_search_args,
-    request_feedback_args
+    request_feedback_args,
 )
 
 
-class UserFeedbackResource(ErrorHandlersMixin, Resource):
+class FeedbackErrorHandlersMixin:
+    """Error mixin handler for Feedback Resources classes."""
+
+    error_handlers = {
+        **ErrorHandlersMixin.error_handlers,
+        IntegrityError: create_error_handler(
+            HTTPJSONException(
+                code=409,
+                description="User have already created feedback for this record.",
+            )
+        ),
+    }
+
+
+class FeedbackResource(FeedbackErrorHandlersMixin, Resource):
+    """Record resource."""
 
     def __init__(self, config, service):
-        super(UserFeedbackResource, self).__init__(config)
-
+        """Constructor."""
+        super(FeedbackResource, self).__init__(config)
         self.service = service
 
     def create_url_rules(self):
+        """Create the URL rules for the record resource."""
         routes = self.config.routes
         return [
             # General routes
-            route("GET", routes["base"], self.search_feedback),
-            route("PUT", routes["base"], self.update_feedback),
-            route("POST", routes["base"], self.create_feedback),
-            route("DELETE", routes["base"], self.delete_feedback),
-
+            route("GET", routes["list"], self.search),
+            route("POST", routes["list"], self.create),
+            route("PUT", routes["item"], self.update),
+            route("DELETE", routes["item"], self.delete),
             # Admin routes
             route("POST", routes["deny-item"], self.deny_feedback),
-            route("POST", routes["allow-item"], self.allow_feedback)
+            route("POST", routes["allow-item"], self.allow_feedback),
         ]
+
+    @request_search_args
+    @response_handler(many=True)
+    def search(self):
+        """Perform a search over the items."""
+        hits = self.service.search(
+            identity=g.identity,
+            params=resource_requestctx.args,
+            es_preference=es_preference(),
+        )
+        return hits.to_dict(), 200
 
     @request_data
     @request_record_args
     @response_handler()
-    def create_feedback(self):
-        created_feedback = self.service.create_feedback(
+    def create(self):
+        """Create an item."""
+        item = self.service.create(
             g.identity,
             resource_requestctx.args["recid"],
-            resource_requestctx.data,
-            auto_approve=current_app.config.get("GEO_FEEDBACK_AUTO_APPROVE", False)
+            resource_requestctx.data or {},
+            auto_approve=current_app.config.get("GEO_FEEDBACK_AUTO_APPROVE", False),
         )
+        return item.to_dict(), 201
 
-        return created_feedback.to_dict(), 201
-
-    @request_search_args
-    @response_handler(many=True)
-    def search_feedback(self):
-        selected_feedbacks = self.service.search_record_feedback(g.identity, **resource_requestctx.args)
-
-        return [sfeedback.to_dict() for sfeedback in selected_feedbacks], 200
-
+    @request_headers
+    @request_feedback_args
     @request_data
-    @request_feedback_args
     @response_handler()
-    def update_feedback(self):
-        feedback_edited = self.service.edit_feedback(
-            g.identity,
-            resource_requestctx.args["id"],
-            resource_requestctx.data
+    def update(self):
+        """Update an item."""
+        item = self.service.update(
+            identity=g.identity,
+            feedback_id=resource_requestctx.args["fid"],
+            data=resource_requestctx.data,
         )
-
-        return feedback_edited.to_dict(), 200
+        return item.to_dict(), 200
 
     @request_feedback_args
-    def delete_feedback(self):
-        self.service.delete_feedback(
-            g.identity,
-            resource_requestctx.args["id"]
+    def delete(self):
+        """Delete an item."""
+        self.service.delete(
+            identity=g.identity, feedback_id=resource_requestctx.args["fid"]
         )
+        return "", 204
 
-        return '', 204
-
+    @request_headers
+    @request_read_args
     @request_feedback_args
     def deny_feedback(self):
         denied_feedback = self.service.deny_feedback(
-            g.identity,
-            resource_requestctx.args["id"]
+            identity=g.identity, feedback_id=resource_requestctx.args["fid"]
         )
 
         return denied_feedback.to_dict(), 200
 
+    @request_headers
+    @request_read_args
     @request_feedback_args
     def allow_feedback(self):
         allowed_feedback = self.service.allow_feedback(
-            g.identity,
-            resource_requestctx.args["id"]
+            identity=g.identity, feedback_id=resource_requestctx.args["fid"]
         )
 
         return allowed_feedback.to_dict(), 200
-
-
-__all__ = (
-    "UserFeedbackResource"
-)

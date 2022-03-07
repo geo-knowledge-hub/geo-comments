@@ -9,11 +9,20 @@
 
 """Feedback module for GEO Knowledge Hub"""
 
-from . import config
-from .feedback.resources.config import UserFeedbackResourceConfig
-from .feedback.resources.resource import UserFeedbackResource
-from .feedback.services.config import FeedbackServiceConfig
-from .feedback.services.service import UserFeedbackService
+from geo_feedback import config
+
+from geo_feedback.feedback.resources.config import FeedbackResourceConfig
+
+from geo_feedback.feedback.resources.resource import FeedbackResource
+
+from geo_feedback.feedback.services.config import (
+    FeedbackServiceConfig,
+    FeedbackRecordServiceConfig,
+)
+from geo_feedback.feedback.services.services import (
+    FeedbackService,
+    FeedbackRecordService
+)
 
 
 class GEOFeedback(object):
@@ -27,7 +36,7 @@ class GEOFeedback(object):
     def init_app(self, app):
         """Flask application initialization."""
         self.init_config(app)
-        app.extensions['geo-feedback'] = self
+        app.extensions["geo-feedback"] = self
 
         self.init_services(app)
         self.init_resources(app)
@@ -35,14 +44,19 @@ class GEOFeedback(object):
     def init_config(self, app):
         """Initialize configuration."""
         for k in dir(config):
-            if k.startswith('GEO_FEEDBACK_'):
+            if k.startswith("GEO_FEEDBACK_"):
                 app.config.setdefault(k, getattr(config, k))
 
     def init_services(self, app):
-        self.service = UserFeedbackService(FeedbackServiceConfig)
+        """Initialize the services."""
+
+        self.feedback_service = FeedbackService(
+            config=FeedbackServiceConfig,
+            record_service=FeedbackRecordService(FeedbackRecordServiceConfig),
+        )
 
     def init_resources(self, app):
-        self.feedback_resource = UserFeedbackResource(
-            UserFeedbackResourceConfig,
-            self.service
+        """Initialize the resources."""
+        self.feedback_resource = FeedbackResource(
+            FeedbackResourceConfig, self.feedback_service
         )

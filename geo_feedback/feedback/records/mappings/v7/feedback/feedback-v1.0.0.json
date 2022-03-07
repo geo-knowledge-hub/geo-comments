@@ -1,0 +1,39 @@
+{
+  "mappings": {
+    "date_detection": false,
+    "numeric_detection": false,
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "status": {
+        "type": "keyword"
+      },
+      "comment": {
+        "type": "text"
+      },
+      "record_pid": {
+        "type": "keyword"
+      },
+      "user_id": {
+        "type": "keyword"
+      },
+      "created": {
+        "type": "date"
+      },
+      "updated": {
+        "type": "date"
+      },
+      "topics": {
+        "properties": {
+          "name": {
+            "type": "keyword"
+          },
+          "rating": {
+            "type": "float"
+          }
+        }
+      }
+    }
+  }
+}

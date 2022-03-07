@@ -7,25 +7,32 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
+from marshmallow import Schema, fields, validate
+from marshmallow_utils.fields import SanitizedHTML, SanitizedUnicode
 
-from marshmallow import Schema, fields
 
+class FeedbackTopicSchema(Schema):
+    """Feedback Topic schema class."""
 
-class FeedbackCategorySchema(Schema):
-    name = fields.String(required=True)
-    rating = fields.Float(required=True)
+    rating = fields.Number(required=True)
+    name = SanitizedUnicode(required=True)
 
 
 class FeedbackSchema(Schema):
-    id = fields.Integer(dump_only=True)
+    """Feedback schema class."""
 
-    comment = fields.String(required=True)
-    topics = fields.List(cls_or_instance=fields.Nested(FeedbackCategorySchema()), required=True)
+    id = fields.UUID(dump_only=True)
 
-    author = fields.String(dump_only=True)
+    comment = SanitizedHTML(required=True)
+    topics = fields.List(
+        cls_or_instance=fields.Nested(FeedbackTopicSchema()), required=True
+    )
 
+    status = SanitizedUnicode(
+        validate=lambda obj: (validate.OneOf(choices=["A", "D"]))(obj),
+        dump_only=True,
+        required=True,
+    )
 
-__all__ = (
-    "FeedbackSchema",
-    "FeedbackCategorySchema"
-)
+    user_id = fields.Integer(required=True, dump_only=True, attribute="user_id")
+    record_pid = SanitizedUnicode(required=True, dump_only=True, attribute="record_pid")

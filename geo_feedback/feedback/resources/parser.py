@@ -9,26 +9,28 @@
 
 from flask_resources import request_body_parser, from_conf, request_parser
 
+#
+# Request args
+#
 request_data = request_body_parser(
     parsers=from_conf("request_body_parsers"),
-    default_content_type=from_conf("default_content_type")
+    default_content_type=from_conf("default_content_type"),
 )
+
+#
+# Args
+#
+request_read_args = request_parser(from_conf("request_read_args"), location="args")
+
+request_record_args = request_parser(from_conf("request_record_args"), location="args")
+
+request_search_args = request_parser(from_conf("request_search_args"), location="args")
 
 request_feedback_args = request_parser(
     from_conf("request_feedback_args"), location="args"
 )
 
-request_record_args = request_parser(
-    from_conf("request_record_args"), location="args"
-)
-
-request_search_args = request_parser(
-    from_conf("request_search_args"), location="args"
-)
-
-__all__ = (
-    "request_data",
-    "request_search_args",
-    "request_record_args",
-    "request_feedback_args"
-)
+#
+# Headers
+#
+request_headers = request_parser(from_conf("request_headers"), location="headers")

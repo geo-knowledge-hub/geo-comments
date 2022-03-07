@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "local://requests/definitions-v1.0.0.json",
+  "type": "object",
+  "additionalProperties": false,
+  "user": {
+    "type": "integer"
+  },
+  "topic": {
+    "description": "Feedback topic schema",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "rating": {
+        "type": "number"
+      }
+    }
+  },
+  "topics": {
+    "description": "Feedback topics schema",
+    "type": "array",
+    "additionalProperties": false,
+    "items": {
+      "$ref": "#/topic"
+    }
+  }
+}

@@ -7,21 +7,33 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-
-from .generators import GeoSecretariat, FeedbackOwner
-
-from invenio_records_permissions.generators import SystemProcess, AuthenticatedUser
+from invenio_records_permissions.generators import SystemProcess
 from invenio_records_permissions.policies.records import RecordPermissionPolicy
 
+from geo_config.security.generators import GeoSecretariat
 
-class RecordRatingPermissionPolicy(RecordPermissionPolicy):
-    """Access control configuration for Record ratings.
-    """
+from geo_feedback.feedback.services.security.generators import (
+    IfIsEqual,
+    FeedbackOwner,
+    FeedbackAuthenticatedUser,
+)
+
+
+class FeedbackPermissionPolicy(RecordPermissionPolicy):
+    """Feedback permission policy."""
 
     #
     # High-level permissions
     #
-    can_use = [AuthenticatedUser()]
+    can_use = [
+        IfIsEqual(
+            field="status",
+            equal_to="D",
+            then_=[GeoSecretariat(), FeedbackOwner()],
+            else_=[FeedbackAuthenticatedUser()],
+        ),
+    ]
+
     can_curate = [GeoSecretariat(), SystemProcess()]
 
     can_manage = can_curate + [FeedbackOwner()]
@@ -40,15 +52,10 @@ class RecordRatingPermissionPolicy(RecordPermissionPolicy):
     can_create = can_use
 
     # Allow editing published ratings
-    can_edit = can_manage
+    can_update = can_manage
 
     # Allow deleting
     can_delete = can_manage
 
     # Allow approving/denying comments
     can_change_state = can_curate
-
-
-__all__ = (
-    "RecordRatingPermissionPolicy"
-)
