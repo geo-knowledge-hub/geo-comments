@@ -7,18 +7,24 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-from abc import ABC, abstractmethod
-
-from itertools import chain
+import operator
+from functools import reduce
 
 from flask_principal import UserNeed
 
-from invenio_records.dictutils import dict_lookup
-
 from invenio_access.permissions import authenticated_user
-from invenio_records_permissions.generators import Generator, AuthenticatedUser
+from invenio_records_permissions.generators import Generator
 
 from elasticsearch_dsl.query import Q
+
+from geo_config.security.generators import IfIsEqual
+from geo_config.security.generators import GeoSecretariat as GeoSecretariatBaseGenerator
+
+
+class GeoSecretariat(GeoSecretariatBaseGenerator):
+    def query_filter(self, identity=None, **kwargs):
+        """Filters for current identity as super user."""
+        return Q("match", **{"status": "D"}) | Q("match", **{"status": "A"})
 
 
 class FeedbackOwner(Generator):
@@ -27,75 +33,39 @@ class FeedbackOwner(Generator):
     def needs(self, record=None, **kwargs):
         if not record:
             return [authenticated_user]
-
         return [UserNeed(record.get("user_id"))]
 
+    def query_filter(self, identity=None, **kwargs):
+        """Filters for current identity as super user."""
+        return Q("term", **{"user_id": identity.id})
 
-class BaseConditionalGenerator(ABC, Generator):
-    """Base generator to enable the creation of conditional generators."""
 
-    @abstractmethod
-    def generators(self, record):
-        """Choose between 'then' or 'else' generators."""
-
-    def needs(self, record=None, **kwargs):
-        """Needs to granting permission."""
-
-        # in the chain above is checked if the
-        # ``g`` has ``needs``. In this case is assumed
-        # that ``g`` is a ``Generator``. Otherwise, is
-        # assumed that ``g`` is a ``flask_principal.Need``.
-        return list(
-            set(
-                chain.from_iterable(
-                    [
-                        g.needs(record=record, **kwargs) if hasattr(g, "needs") else [g]
-                        for g in self.generators(record)
-                    ]
-                )
-            )
+class IfDenied(IfIsEqual):
+    def __init__(self, then_, else_):
+        """Initializer"""
+        super().__init__(
+            field="status",
+            equal_to="D",
+            then_=then_,
+            else_=else_,
         )
 
+    def make_query(self, generators, **kwargs):
+        """Make a query for one set of generators.
 
-class IfIsEqual(BaseConditionalGenerator):
-    """IfIsEqual generator.
-    This conditional generator check if a record attribute is equal a defined value:
-        IfIsEqual(
-            field    = 'data.status',
-            equal_to = 'A',
-            then_    = [<Generator>, <Generator>,],
-            else_    = [<Generator>, <Generator>,]
-        )
-    Note:
-        The ideia and base implementation of the conditional generators is presented in the
-        Invenio-RDM-Records, so, thanks invenio team for this.
-    """
-
-    def __init__(self, field, equal_to, then_, else_):
-        self.field = field
-        self.then_ = then_
-        self.else_ = else_
-
-        self.equal_to = equal_to
-
-    def generators(self, record):
-        """Choose between 'then' or 'else' generators."""
-        if record is None:
-            return self.else_
-
-        # getting the field using pydash
-        # (handle properties and keys equally)
-        value = dict_lookup(record, self.field)
-
-        if value == self.equal_to:
-            return self.then_
-        return self.else_
-
-
-class FeedbackAuthenticatedUser(AuthenticatedUser):
-    """Allows authenticated users to read allowed feedbacks."""
+        Note:
+            This code is adapted from: https://github.com/inveniosoftware/invenio-rdm-records/blob/cc6ca4ea5283a888278e4d490b8ee5ca78e912ad/invenio_rdm_records/services/generators.py#L69
+        """
+        queries = [g.query_filter(**kwargs) for g in generators]
+        queries = [q for q in queries if q]
+        return reduce(operator.or_, queries) if queries else None
 
     def query_filter(self, **kwargs):
-        """Filters for current identity as super user."""
-        # TODO: Implement with new permissions metadata
-        return Q("term", **{"status": "A"})
+        """Filters for allowed or denied records."""
+        q_denied = Q("match", **{"status": "D"})
+        q_allowed = Q("match", **{"status": "A"})
+
+        then_query = self.make_query(self.then_, **kwargs)
+        else_query = self.make_query(self.else_, **kwargs)
+
+        return (q_denied & then_query) | (q_allowed & else_query)

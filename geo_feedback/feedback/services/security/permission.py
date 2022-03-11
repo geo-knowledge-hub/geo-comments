@@ -10,13 +10,10 @@
 from invenio_records_permissions.generators import SystemProcess
 from invenio_records_permissions.policies.records import RecordPermissionPolicy
 
-from geo_config.security.generators import GeoSecretariat
+from invenio_records_permissions.generators import AuthenticatedUser
 
-from geo_feedback.feedback.services.security.generators import (
-    IfIsEqual,
-    FeedbackOwner,
-    FeedbackAuthenticatedUser,
-)
+from geo_config.security.generators import GeoSecretariat
+from geo_feedback.feedback.services.security.generators import IfDenied, FeedbackOwner
 
 
 class FeedbackPermissionPolicy(RecordPermissionPolicy):
@@ -26,11 +23,9 @@ class FeedbackPermissionPolicy(RecordPermissionPolicy):
     # High-level permissions
     #
     can_use = [
-        IfIsEqual(
-            field="status",
-            equal_to="D",
+        IfDenied(
             then_=[GeoSecretariat(), FeedbackOwner()],
-            else_=[FeedbackAuthenticatedUser()],
+            else_=[AuthenticatedUser()],
         ),
     ]
 
