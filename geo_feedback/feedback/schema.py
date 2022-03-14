@@ -35,4 +35,6 @@ class FeedbackSchema(Schema):
     )
 
     user_id = fields.Integer(required=True, dump_only=True, attribute="user_id")
-    record_pid = SanitizedUnicode(required=True, dump_only=True, attribute="record_pid")
+    record_pid = SanitizedUnicode(
+        required=True, dump_only=False, attribute="record_pid"
+    )

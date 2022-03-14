@@ -31,7 +31,7 @@ class FeedbackResourceConfig(ResourceConfig):
     routes = {
         # General routes
         "list": "",
-        "item": "",
+        "item": "<fid>",
         # Admin routes
         "deny-item": "/actions/deny",
         "allow-item": "/actions/allow",
@@ -41,8 +41,7 @@ class FeedbackResourceConfig(ResourceConfig):
     request_read_args = {}
     request_search_args = SearchRequestArgsSchema
     request_headers = {"if_match": ma.fields.Int()}
-    request_record_args = {"recid": ma.fields.String(required=True)}
-    request_feedback_args = {"fid": ma.fields.UUID(required=True)}
+    request_feedback_view_args = {"fid": ma.fields.UUID(required=True)}
 
     request_body_parsers = {"application/json": RequestBodyParser(JSONDeserializer())}
 

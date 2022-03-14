@@ -21,13 +21,10 @@ request_data = request_body_parser(
 # Args
 #
 request_read_args = request_parser(from_conf("request_read_args"), location="args")
-
-request_record_args = request_parser(from_conf("request_record_args"), location="args")
-
 request_search_args = request_parser(from_conf("request_search_args"), location="args")
 
-request_feedback_args = request_parser(
-    from_conf("request_feedback_args"), location="args"
+request_feedback_view_args = request_parser(
+    from_conf("request_feedback_view_args"), location="view_args"
 )
 
 #

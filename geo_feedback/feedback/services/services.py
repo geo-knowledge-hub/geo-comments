@@ -16,35 +16,31 @@ from invenio_records_resources.services.uow import (
     unit_of_work,
 )
 
-from invenio_rdm_records.services.services import RDMRecordService
-
 from geo_feedback.feedback.records.models import FeedbackStatus
 from geo_feedback.feedback.services.links import ActionLinksTemplate
-
-
-class FeedbackRecordService(RDMRecordService):
-    """Feedback record service class."""
 
 
 class FeedbackService(InvenioBaseService):
     """Feedback service class."""
 
-    def __init__(self, config, record_service=None):
+    def __init__(self, config):
         super(FeedbackService, self).__init__(config)
-
-        self._record_service = record_service
 
     @property
     def links_item_tpl(self):
         """Item links template."""
         return ActionLinksTemplate(self.config.links_item, self.config.links_action)
 
+    @property
+    def record_associated_cls(self):
+        """Class of a record associated to a feedback."""
+        return self.config.record_associated_cls
+
     @unit_of_work()
     def _create(
         self,
         record_cls,
         identity,
-        recid,
         data,
         auto_approve=False,
         raise_errors=True,
@@ -62,14 +58,18 @@ class FeedbackService(InvenioBaseService):
         feedback = record_cls.create({})
 
         # searching for feedback record
-        record = self._record_service.read(id_=recid, identity=identity)
+        record_pid = data.get("record_pid")
+
+        record = self.record_associated_cls.pid.resolve(
+            record_pid, registered_only=True
+        )
 
         # running the components
         self.run_components(
             "create",
             identity,
             data=data,
-            record=record._obj,
+            record=record,
             feedback=feedback,
             auto_approve=auto_approve,
             errors=errors,
@@ -84,17 +84,16 @@ class FeedbackService(InvenioBaseService):
         )
 
     @unit_of_work()
-    def create(self, identity, recid, data, auto_approve=False, uow=None):
+    def create(self, identity, data, auto_approve=False, uow=None):
         """Create a feedback record."""
         return self._create(
-            self.record_cls, identity, recid, data, auto_approve=auto_approve, uow=uow
+            self.record_cls, identity, data, auto_approve=auto_approve, uow=uow
         )
 
     def read(self, identity, feedback_id):
         """Read a feedback matching the id."""
         # reading the feedback
-        feedback = self.record_cls.get_record(id_=feedback_id)
-
+        feedback = self.record_cls.get_record(id_=feedback_id, with_denied=True)
         self.require_permission(identity, "read", record=feedback)
 
         return self.result_item(

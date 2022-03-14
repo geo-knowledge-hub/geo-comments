@@ -27,9 +27,8 @@ from geo_feedback.feedback.resources.parser import (
     request_data,
     request_headers,
     request_read_args,
-    request_record_args,
     request_search_args,
-    request_feedback_args,
+    request_feedback_view_args,
 )
 
 
@@ -64,6 +63,7 @@ class FeedbackResource(FeedbackErrorHandlersMixin, Resource):
             route("POST", routes["list"], self.create),
             route("PUT", routes["item"], self.update),
             route("DELETE", routes["item"], self.delete),
+            route("GET", routes["item"], self.read),
             # Admin routes
             route("POST", routes["deny-item"], self.deny_feedback),
             route("POST", routes["allow-item"], self.allow_feedback),
@@ -80,56 +80,65 @@ class FeedbackResource(FeedbackErrorHandlersMixin, Resource):
         )
         return hits.to_dict(), 200
 
+    @request_feedback_view_args
+    @response_handler(many=False)
+    def read(self):
+        """Read an item."""
+        item = self.service.read(
+            g.identity,
+            feedback_id=resource_requestctx.view_args["fid"],
+        )
+
+        return item.to_dict(), 200
+
     @request_data
-    @request_record_args
     @response_handler()
     def create(self):
         """Create an item."""
         item = self.service.create(
             g.identity,
-            resource_requestctx.args["recid"],
             resource_requestctx.data or {},
             auto_approve=current_app.config.get("GEO_FEEDBACK_AUTO_APPROVE", False),
         )
         return item.to_dict(), 201
 
     @request_headers
-    @request_feedback_args
+    @request_feedback_view_args
     @request_data
     @response_handler()
     def update(self):
         """Update an item."""
         item = self.service.update(
             identity=g.identity,
-            feedback_id=resource_requestctx.args["fid"],
+            feedback_id=resource_requestctx.view_args["fid"],
             data=resource_requestctx.data,
         )
         return item.to_dict(), 200
 
-    @request_feedback_args
+    @request_feedback_view_args
     def delete(self):
         """Delete an item."""
         self.service.delete(
-            identity=g.identity, feedback_id=resource_requestctx.args["fid"]
+            identity=g.identity, feedback_id=resource_requestctx.view_args["fid"]
         )
         return "", 204
 
     @request_headers
     @request_read_args
-    @request_feedback_args
+    @request_feedback_view_args
     def deny_feedback(self):
         denied_feedback = self.service.deny_feedback(
-            identity=g.identity, feedback_id=resource_requestctx.args["fid"]
+            identity=g.identity, feedback_id=resource_requestctx.view_args["fid"]
         )
 
         return denied_feedback.to_dict(), 200
 
     @request_headers
     @request_read_args
-    @request_feedback_args
+    @request_feedback_view_args
     def allow_feedback(self):
         allowed_feedback = self.service.allow_feedback(
-            identity=g.identity, feedback_id=resource_requestctx.args["fid"]
+            identity=g.identity, feedback_id=resource_requestctx.view_args["fid"]
         )
 
         return allowed_feedback.to_dict(), 200

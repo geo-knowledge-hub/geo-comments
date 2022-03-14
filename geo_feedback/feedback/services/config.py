@@ -11,7 +11,7 @@ from invenio_records_resources.services.records.links import (
     pagination_links,
 )
 
-from invenio_rdm_records.services.config import RDMRecordServiceConfig
+from invenio_rdm_records.records.api import RDMRecord
 
 from invenio_records_resources.services.records.config import SearchOptions
 from invenio_records_resources.services.records.config import RecordServiceConfig
@@ -21,9 +21,7 @@ from geo_feedback.feedback.records.api import FeedbackRecord
 
 from geo_feedback.feedback.services.components import FeedbackData
 from geo_feedback.feedback.services.links import FeedbackLink
-from geo_feedback.feedback.services.security.permission import (
-    FeedbackPermissionPolicy
-)
+from geo_feedback.feedback.services.security.permission import FeedbackPermissionPolicy
 
 from geo_feedback.feedback.services import facets
 
@@ -32,10 +30,6 @@ class FeedbackSearchOptions(SearchOptions):
     """Search Options for the Feedback."""
 
     facets = {"status": facets.status, "record": facets.record}
-
-
-class FeedbackRecordServiceConfig(RDMRecordServiceConfig):
-    """Record service configuration."""
 
 
 class FeedbackServiceConfig(RecordServiceConfig):
@@ -58,6 +52,8 @@ class FeedbackServiceConfig(RecordServiceConfig):
     #
     record_cls = FeedbackRecord
 
+    record_associated_cls = RDMRecord
+
     #
     # Service configuration
     #
@@ -70,7 +66,7 @@ class FeedbackServiceConfig(RecordServiceConfig):
             "{+api}/feedbacks/actions/allow?q=id:{id}",
         ),
         "deny": FeedbackLink(
-           "{+api}/feedbacks/actions/deny?q=id:{id}",
+            "{+api}/feedbacks/actions/deny?q=id:{id}",
         ),
     }
 
