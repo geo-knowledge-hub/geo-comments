@@ -7,78 +7,47 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-
 import marshmallow as ma
+
 from flask_resources import (
     ResourceConfig,
     ResponseHandler,
     JSONSerializer,
     RequestBodyParser,
     JSONDeserializer,
-    HTTPJSONException,
-    create_error_handler
 )
 
-from sqlalchemy.exc import IntegrityError
 
-feedback_error_handlers = {
-    IntegrityError: create_error_handler(
-        HTTPJSONException(
-            code=409,
-            description="User have already created feedback for this record."
-        )
-    )
-}
+from invenio_records_resources.resources.records.headers import etag_headers
+from invenio_records_resources.resources.records.args import SearchRequestArgsSchema
 
 
-class UserFeedbackResourceConfig(ResourceConfig):
+class FeedbackResourceConfig(ResourceConfig):
+    """Feedback resource configuration class."""
+
+    # Blueprint configuration
     url_prefix = "/feedbacks"
     blueprint_name = "geo_feedback"
-
-    request_record_args = {
-        "recid": ma.fields.String(required=True)
-    }
-
-    request_feedback_args = {
-        "id": ma.fields.String(required=True)
-    }
-
-    request_search_args = {
-        # properties
-        "id": ma.fields.String(),
-        "user_id": ma.fields.Int(),
-
-        # status
-        "status": ma.fields.Str(),
-
-        "recid": ma.fields.String()
-    }
-
     routes = {
         # General routes
-        "base": "",
-
+        "list": "",
+        "item": "<fid>",
         # Admin routes
         "deny-item": "/actions/deny",
-        "allow-item": "/actions/allow"
+        "allow-item": "/actions/allow",
     }
 
-    request_body_parsers = {
-        "application/json": RequestBodyParser(JSONDeserializer())
-    }
+    # Request parsing
+    request_read_args = {}
+    request_search_args = SearchRequestArgsSchema
+    request_headers = {"if_match": ma.fields.Int()}
+    request_feedback_view_args = {"fid": ma.fields.UUID(required=True)}
+
+    request_body_parsers = {"application/json": RequestBodyParser(JSONDeserializer())}
 
     response_handlers = {
-        "application/json": ResponseHandler(
-            JSONSerializer()
-        )
+        "application/json": ResponseHandler(JSONSerializer(), headers=etag_headers)
     }
 
     default_content_type = "application/json"
     default_accept_mimetype = "application/json"
-
-    error_handlers = feedback_error_handlers
-
-
-__all__ = (
-    "UserFeedbackResourceConfig"
-)

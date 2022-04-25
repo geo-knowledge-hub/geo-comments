@@ -13,89 +13,86 @@ import os
 
 from setuptools import find_packages, setup
 
-readme = open('README.rst').read()
-history = open('CHANGES.rst').read()
+readme = open("README.rst").read()
+history = open("CHANGES.rst").read()
 
 tests_require = [
-    'pytest-invenio>=1.4.0',
+    "pytest-invenio>=1.4.0",
 ]
 
-invenio_db_version = '>=1.0.9,<2.0.0'
-invenio_search_version = '>=1.4.2,<2.0.0'
+invenio_db_version = ">=1.0.9,<1.1.0"
+invenio_search_version = ">=1.4.2,<1.5.0"
 
 extras_require = {
-    'docs': [
-        'Sphinx>=3,<4',
+    "docs": [
+        "Sphinx>=3,<4",
     ],
-    'elasticsearch6': [
-        f'invenio-search[elasticsearch6]{invenio_search_version}',
+    "elasticsearch7": [
+        f"invenio-search[elasticsearch7]{invenio_search_version}",
     ],
-    'elasticsearch7': [
-        f'invenio-search[elasticsearch7]{invenio_search_version}',
+    "postgresql": [
+        f"invenio-db[postgresql,versioning]{invenio_db_version}",
     ],
-    'postgresql': [
-        f'invenio-db[postgresql,versioning]{invenio_db_version}',
-    ],
-    'tests': tests_require,
+    "sqlite": [f"invenio-db[versioning]{invenio_db_version}"],
+    "tests": tests_require,
 }
 
-extras_require['all'] = [req for _, reqs in extras_require.items() for req in reqs]
+extras_require["all"] = [req for _, reqs in extras_require.items() for req in reqs]
 
-setup_requires = [
-]
+setup_requires = []
 
 install_requires = [
-    'invenio-i18n>=1.2.0',
-    'invenio-rdm-records>=0.32.3,<0.33.0'
+    "invenio-i18n>=1.2.0",
+    "invenio-rdm-records>=0.33.12,<0.34.0",
+    "geo-config @ git+https://github.com/geo-knowledge-hub/geo-config",
 ]
 
 packages = find_packages()
 
 # Get the version string. Cannot be done with import!
 g = {}
-with open(os.path.join('geo_feedback', 'version.py'), 'rt') as fp:
+with open(os.path.join("geo_feedback", "version.py"), "rt") as fp:
     exec(fp.read(), g)
-    version = g['__version__']
+    version = g["__version__"]
 
 setup(
-    name='geo-feedback',
+    name="geo-feedback",
     version=version,
     description=__doc__,
-    long_description=readme + '\n\n' + history,
-    keywords='Geo Knowledge Hub',
-    license='MIT',
-    author='GEO Secretariat',
-    author_email='geokhub@geosec.org',
-    url='https://github.com/geo-knowledge-hub/geo-feedback',
+    long_description=readme + "\n\n" + history,
+    keywords="Geo Knowledge Hub",
+    license="MIT",
+    author="GEO Secretariat",
+    author_email="geokhub@geosec.org",
+    url="https://github.com/geo-knowledge-hub/geo-feedback",
     packages=packages,
     zip_safe=False,
     include_package_data=True,
-    platforms='any',
+    platforms="any",
     entry_points={
-        'invenio_base.apps': [
-            'geo_feedback = geo_feedback:GEOFeedback',
+        "invenio_base.apps": [
+            "geo_feedback = geo_feedback:GEOFeedback",
         ],
-        'invenio_db.models': [
-            'geo_feedback = geo_feedback.feedback.records.models'
-        ],
-        'invenio_config.module': [
+        "invenio_config.module": [
             "geo_feedback = geo_feedback.config",
         ],
-        'invenio_base.api_apps': [
-            'geo_feedback = geo_feedback:GEOFeedback',
+        "invenio_base.api_apps": [
+            "geo_feedback = geo_feedback:GEOFeedback",
         ],
-        'invenio_assets.webpack': [
-            'geo_feedback = geo_feedback.theme.webpack:theme'
+        "invenio_assets.webpack": ["geo_feedback = geo_feedback.theme.webpack:theme"],
+        "invenio_base.api_blueprints": [
+            "geo_feedback = geo_feedback.views.api:create_feedback_api_blueprint",
         ],
-        "invenio_base.blueprints": [
-            "geo_feedback = geo_feedback.views.page:blueprint",
+        "invenio_i18n.translations": [
+            "messages = geo_feedback",
         ],
-        'invenio_base.api_blueprints': [
-            'geo_feedback = geo_feedback.views.api:create_feedback_api_blueprint',
+        "invenio_db.models": ["feedback = geo_feedback.feedback.records.models"],
+        "invenio_search.mappings": [
+            "feedback = geo_feedback.feedback.records.mappings"
         ],
-        'invenio_i18n.translations': [
-            'messages = geo_feedback',
-        ],
+        "invenio_jsonschemas.schemas": [
+            "feedback = geo_feedback.feedback.records.jsonschemas"
+        ]
         # 'invenio_access.actions': [],
         # 'invenio_admin.actions': [],
         # 'invenio_assets.bundles': [],
@@ -107,18 +104,18 @@ setup(
     setup_requires=setup_requires,
     tests_require=tests_require,
     classifiers=[
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Development Status :: 1 - Planning',
+        "Environment :: Web Environment",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Development Status :: 1 - Planning",
     ],
 )

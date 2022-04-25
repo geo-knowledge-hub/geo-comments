@@ -6,13 +6,3 @@
 # GEO Knowledge Hub User's Feedback Component is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 #
-
-"""Feedback module for Geo Knowledge Hub"""
-
-from flask import Blueprint
-
-blueprint = Blueprint(
-    "geo_feedback",
-    __name__,
-    template_folder="../theme/templates"
-)
