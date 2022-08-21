@@ -7,14 +7,11 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-"""Feedback module for GEO Knowledge Hub"""
+"""Feedback module for GEO Knowledge Hub."""
 
 from geo_feedback import config
-
 from geo_feedback.feedback.resources.config import FeedbackResourceConfig
-
 from geo_feedback.feedback.resources.resource import FeedbackResource
-
 from geo_feedback.feedback.services.config import FeedbackServiceConfig
 from geo_feedback.feedback.services.services import FeedbackService
 
@@ -43,7 +40,6 @@ class GEOFeedback(object):
 
     def init_services(self, app):
         """Initialize the services."""
-
         self.feedback_service = FeedbackService(config=FeedbackServiceConfig)
 
     def init_resources(self, app):

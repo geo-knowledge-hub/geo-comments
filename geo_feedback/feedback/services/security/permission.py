@@ -7,13 +7,13 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-from invenio_records_permissions.generators import SystemProcess
-from invenio_records_permissions.policies.records import RecordPermissionPolicy
-
-from invenio_records_permissions.generators import AuthenticatedUser
+"""Feedback permission policy."""
 
 from geo_config.security.generators import GeoSecretariat
-from geo_feedback.feedback.services.security.generators import IfDenied, FeedbackOwner
+from invenio_records_permissions.generators import AuthenticatedUser, SystemProcess
+from invenio_records_permissions.policies.records import RecordPermissionPolicy
+
+from geo_feedback.feedback.services.security.generators import FeedbackOwner, IfDenied
 
 
 class FeedbackPermissionPolicy(RecordPermissionPolicy):

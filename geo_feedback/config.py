@@ -7,7 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-"""Feedback module for GEO Knowledge Hub"""
+"""Feedback module for GEO Knowledge Hub."""
 
 GEO_FEEDBACK_AUTO_APPROVE = True
 """Enable automatic feedback approval"""

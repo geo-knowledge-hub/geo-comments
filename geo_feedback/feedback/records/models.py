@@ -11,15 +11,13 @@
 
 from enum import Enum
 
-from invenio_db import db
-from invenio_records.models import RecordMetadataBase
-
-from sqlalchemy_utils.types import UUIDType
-
 from invenio_accounts.models import User as InvenioUser
+from invenio_db import db
 from invenio_rdm_records.records.models import (
     RDMRecordMetadata as InvenioRecordMetadata,
 )
+from invenio_records.models import RecordMetadataBase
+from sqlalchemy_utils.types import UUIDType
 
 
 class FeedbackStatus(Enum):

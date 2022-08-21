@@ -7,9 +7,9 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-"""Feedback module for GEO Knowledge Hub"""
+"""Feedback module for GEO Knowledge Hub."""
 
 from .ext import GEOFeedback
-from .version import __version__
 
-__all__ = ('__version__', 'GEOFeedback')
+__version__ = "0.1.0"
+__all__ = ("__version__", "GEOFeedback")

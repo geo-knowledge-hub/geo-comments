@@ -5,25 +5,22 @@
 # geo-feedback is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-from invenio_records_resources.services.records.results import RecordItem, RecordList
-
-from invenio_records_resources.services.records.links import (
-    pagination_links,
-)
+"""Feedback service config."""
 
 from invenio_rdm_records.records.api import RDMRecord
+from invenio_records_resources.services.records.config import (
+    RecordServiceConfig,
+    SearchOptions,
+)
+from invenio_records_resources.services.records.links import pagination_links
+from invenio_records_resources.services.records.results import RecordItem, RecordList
 
-from invenio_records_resources.services.records.config import SearchOptions
-from invenio_records_resources.services.records.config import RecordServiceConfig
-
-from geo_feedback.feedback.schema import FeedbackSchema
 from geo_feedback.feedback.records.api import FeedbackRecord
-
+from geo_feedback.feedback.schema import FeedbackSchema
+from geo_feedback.feedback.services import facets
 from geo_feedback.feedback.services.components import FeedbackData
 from geo_feedback.feedback.services.links import FeedbackLink
 from geo_feedback.feedback.services.security.permission import FeedbackPermissionPolicy
-
-from geo_feedback.feedback.services import facets
 
 
 class FeedbackSearchOptions(SearchOptions):

@@ -7,12 +7,13 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
+"""Feedback System Field entity."""
+
 from invenio_records.systemfields import SystemField
 
 
 class EntityField(SystemField):
     """System field for managing feedback related entities.
-
 
     Note:
         This class is based on the ``invenio-rdm-records``. In specific, its used

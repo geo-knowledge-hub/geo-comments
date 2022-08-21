@@ -7,28 +7,27 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-from flask import g, current_app
+"""Feedback resource."""
+
+from flask import current_app, g
 from flask_resources import (
-    route,
-    response_handler,
-    resource_requestctx,
-    create_error_handler,
-    Resource,
     HTTPJSONException,
+    Resource,
+    create_error_handler,
+    resource_requestctx,
+    response_handler,
+    route,
 )
-
-from sqlalchemy.exc import IntegrityError
-
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
 from invenio_records_resources.resources.records.utils import es_preference
-
+from sqlalchemy.exc import IntegrityError
 
 from geo_feedback.feedback.resources.parser import (
     request_data,
+    request_feedback_view_args,
     request_headers,
     request_read_args,
     request_search_args,
-    request_feedback_view_args,
 )
 
 
@@ -127,6 +126,7 @@ class FeedbackResource(FeedbackErrorHandlersMixin, Resource):
     @request_read_args
     @request_feedback_view_args
     def deny_feedback(self):
+        """Deny feedback."""
         denied_feedback = self.service.deny_feedback(
             identity=g.identity, feedback_id=resource_requestctx.view_args["fid"]
         )
@@ -137,6 +137,7 @@ class FeedbackResource(FeedbackErrorHandlersMixin, Resource):
     @request_read_args
     @request_feedback_view_args
     def allow_feedback(self):
+        """Allow feedback."""
         allowed_feedback = self.service.allow_feedback(
             identity=g.identity, feedback_id=resource_requestctx.view_args["fid"]
         )

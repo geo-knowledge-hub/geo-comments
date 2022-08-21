@@ -7,7 +7,9 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-from flask_resources import request_body_parser, from_conf, request_parser
+"""Resource Parser."""
+
+from flask_resources import from_conf, request_body_parser, request_parser
 
 #
 # Request args
