@@ -7,9 +7,10 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-from invenio_records_resources.services.records.links import Link
+"""Service links."""
 
 from invenio_records_resources.services.base.links import LinksTemplate
+from invenio_records_resources.services.records.links import Link
 
 
 class ActionLinksTemplate(LinksTemplate):
@@ -23,7 +24,6 @@ class ActionLinksTemplate(LinksTemplate):
 
     def expand(self, obj):
         """Expand all the link templates."""
-
         links = {"actions": {}}
         ctx = self.context
         for key, link in self._links.items():
@@ -39,7 +39,7 @@ class ActionLinksTemplate(LinksTemplate):
 
 
 class FeedbackLink(Link):
-    """Short cut for writing feedback links."""
+    """Shortcut for writing feedback links."""
 
     @staticmethod
     def vars(record, vars):

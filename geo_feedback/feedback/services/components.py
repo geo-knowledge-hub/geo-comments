@@ -5,6 +5,8 @@
 # geo-feedback is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
+"""Feedback service components."""
+
 from invenio_records_resources.services.records.components import (
     ServiceComponent as BaseServiceComponent,
 )
@@ -24,15 +26,19 @@ class FeedbackComponentBase(BaseServiceComponent):
         auto_approve=False,
         **kwargs
     ):
+        """Create handler."""
         pass
 
     def delete(self, identity, feedback=None, **kwargs):
+        """Delete handler."""
         pass
 
     def update(self, identity, feedback=None, data=None):
+        """Update handler."""
         pass
 
     def change_feedback_state(self, identity, feedback=None, state=None, **kwargs):
+        """State handler."""
         pass
 
 
@@ -48,6 +54,7 @@ class FeedbackData(FeedbackComponentBase):
         auto_approve=False,
         **kwargs
     ):
+        """Create handler."""
         # adding data
         feedback.update(data)
 
@@ -60,6 +67,7 @@ class FeedbackData(FeedbackComponentBase):
             feedback.status = FeedbackStatus.ALLOWED.value
 
     def update(self, identity, feedback=None, data=None):
+        """Update handler."""
         feedback.update(data)
 
     def change_feedback_state(
@@ -71,4 +79,5 @@ class FeedbackData(FeedbackComponentBase):
         auto_approve=False,
         **kwargs
     ):
+        """State handler."""
         feedback.status = data.value

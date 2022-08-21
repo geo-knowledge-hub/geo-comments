@@ -7,21 +7,22 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
+"""Permission policy generators for the Feedback service."""
+
 import operator
 from functools import reduce
 
+from elasticsearch_dsl.query import Q
 from flask_principal import UserNeed
-
+from geo_config.security.generators import GeoSecretariat as GeoSecretariatBaseGenerator
+from geo_config.security.generators import IfIsEqual
 from invenio_access.permissions import authenticated_user
 from invenio_records_permissions.generators import Generator
 
-from elasticsearch_dsl.query import Q
-
-from geo_config.security.generators import IfIsEqual
-from geo_config.security.generators import GeoSecretariat as GeoSecretariatBaseGenerator
-
 
 class GeoSecretariat(GeoSecretariatBaseGenerator):
+    """GEO Secretariat generator."""
+
     def query_filter(self, identity=None, **kwargs):
         """Filters for current identity as super user."""
         return Q("match", **{"status": "D"}) | Q("match", **{"status": "A"})
@@ -31,6 +32,7 @@ class FeedbackOwner(Generator):
     """Feedback Owner generator."""
 
     def needs(self, record=None, **kwargs):
+        """Enabling Needs."""
         if not record:
             return [authenticated_user]
         return [UserNeed(record.get("user_id"))]
@@ -41,8 +43,10 @@ class FeedbackOwner(Generator):
 
 
 class IfDenied(IfIsEqual):
+    """Conditional Generator specialized to define permissions for denied feedbacks."""
+
     def __init__(self, then_, else_):
-        """Initializer"""
+        """Initializer."""
         super().__init__(
             field="status",
             equal_to="D",

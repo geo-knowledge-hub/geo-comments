@@ -7,19 +7,18 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-import marshmallow as ma
+"""Feedback resource config."""
 
+import marshmallow as ma
 from flask_resources import (
-    ResourceConfig,
-    ResponseHandler,
+    JSONDeserializer,
     JSONSerializer,
     RequestBodyParser,
-    JSONDeserializer,
+    ResourceConfig,
+    ResponseHandler,
 )
-
-
-from invenio_records_resources.resources.records.headers import etag_headers
 from invenio_records_resources.resources.records.args import SearchRequestArgsSchema
+from invenio_records_resources.resources.records.headers import etag_headers
 
 
 class FeedbackResourceConfig(ResourceConfig):

@@ -33,7 +33,6 @@ GEO Knowledge Hub User's Feedback Component
 About
 -----
 
-
 This package contains a component to allow users expressing their experience about a Knowledge Package in the `GEO Knowledge Hub <https://github.com/geo-knowledge-hub/geo-knowledge-hub>`_. Currently there are three major points to be rated by a user:
 
 - **Clarity:** The package and its components contain enough documentation and clear descriptions.
@@ -42,11 +41,4 @@ This package contains a component to allow users expressing their experience abo
 
 - **Reusability:** The package and its components are organized and linked in a way that allows the used to fully reuse it.
 
-
-This component is based on `InvenioRDM <https://inveniosoftware.org/products/rdm/>`_ and `React <https://github.com/facebook/react>`_.
-
-
 Further documentation is available on https://geo-feedback.readthedocs.io/.
-
-
-

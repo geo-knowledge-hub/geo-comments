@@ -35,7 +35,6 @@ var/
 *.egg
 Pipfile
 Pipfile.lock
-pyproject.toml
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -81,3 +80,4 @@ docs/spec/node_modules
 docs/spec/package-lock.json
 docs/spec/dist/index.html
 
+.python-version

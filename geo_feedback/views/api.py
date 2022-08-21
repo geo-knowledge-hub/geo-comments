@@ -7,7 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-"""Feedback module for Geo Knowledge Hub"""
+"""Feedback module for Geo Knowledge Hub."""
 
 
 def create_feedback_api_blueprint(app):

@@ -7,6 +7,8 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
+"""Feedback schema."""
+
 from marshmallow import Schema, fields, validate
 from marshmallow_utils.fields import SanitizedHTML, SanitizedUnicode
 

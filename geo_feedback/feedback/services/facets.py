@@ -5,6 +5,8 @@
 # geo-feedback is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
+"""Feedback Search Facets."""
+
 from flask_babelex import gettext as _
 from invenio_records_resources.services.records.facets import TermsFacet
 

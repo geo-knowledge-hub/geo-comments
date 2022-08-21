@@ -7,10 +7,11 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-from invenio_records.dictutils import dict_lookup
+"""Feedback entity abstraction fields."""
 
 from invenio_accounts.models import User as InvenioUser
 from invenio_rdm_records.records.api import RDMRecord
+from invenio_records.dictutils import dict_lookup
 
 
 class EntityBase:
@@ -55,6 +56,7 @@ class UserEntity(EntityBase):
 
     @classmethod
     def from_object(cls, instance):
+        """Create a user entity from an object."""
         if type(instance) == dict:
             user_id = dict_lookup(instance, "user_id")
 
@@ -72,6 +74,7 @@ class UserEntity(EntityBase):
         )
 
     def dump(self):
+        """Dump the user entity as a dict."""
         return {"user_id": self._entity.id}
 
 
@@ -82,7 +85,7 @@ class RecordEntity(EntityBase):
 
     @classmethod
     def from_object(cls, instance):
-
+        """Create a Record entity from an object."""
         if type(instance) == dict:
             record_pid = dict_lookup(instance, "record_pid")
             obj = RDMRecord.pid.resolve(record_pid)
@@ -102,4 +105,5 @@ class RecordEntity(EntityBase):
         )
 
     def dump(self):
+        """Dump the user entity as a dict."""
         return {"record_pid": self._entity.pid.pid_value}

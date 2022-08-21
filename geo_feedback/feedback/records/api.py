@@ -7,15 +7,15 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 #
 
-from invenio_db import db
+"""Feedback API."""
 
+from invenio_db import db
 from invenio_records.systemfields import (
-    SystemFieldsMixin,
+    ConstantField,
     DictField,
     ModelField,
-    ConstantField,
+    SystemFieldsMixin,
 )
-
 from invenio_records_resources.records.api import Record
 from invenio_records_resources.records.systemfields import IndexField
 
