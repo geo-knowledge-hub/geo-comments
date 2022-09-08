@@ -6,3 +6,4 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 -e git+https://github.com/geo-knowledge-hub/geo-config#egg=geo-config
+-e git+https://github.com/geo-knowledge-hub/geo-rdm-records@b-0.4#egg=geo-rdm-records
