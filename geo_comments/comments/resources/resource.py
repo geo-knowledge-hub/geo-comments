@@ -21,8 +21,8 @@ from invenio_records_resources.resources.records.utils import es_preference
 from sqlalchemy.exc import IntegrityError
 
 from geo_comments.comments.resources.parser import (
-    request_data,
     request_comment_view_args,
+    request_data,
     request_headers,
     request_read_args,
     request_search_args,

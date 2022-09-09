@@ -7,12 +7,11 @@
 
 """Comment entity abstraction fields."""
 
+from geo_rdm_records.modules.packages.records.api import GEOPackageRecord
+from geo_rdm_records.modules.resources.records.api import GEORecord
 from invenio_accounts.models import User as InvenioUser
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records.dictutils import dict_lookup
-
-from geo_rdm_records.modules.resources.records.api import GEORecord
-from geo_rdm_records.modules.packages.records.api import GEOPackageRecord
 
 
 class EntityBase:

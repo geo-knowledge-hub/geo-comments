@@ -7,7 +7,6 @@
 
 """Feedback service config."""
 
-from invenio_rdm_records.records.api import RDMRecord
 from invenio_records_resources.services.records.config import (
     RecordServiceConfig,
     SearchOptions,
@@ -15,7 +14,6 @@ from invenio_records_resources.services.records.config import (
 from invenio_records_resources.services.records.links import pagination_links
 from invenio_records_resources.services.records.results import RecordItem, RecordList
 
-from geo_comments.comments.records.api import CommentRecord
 from geo_comments.comments.schema import CommentSchema
 from geo_comments.comments.services import facets
 from geo_comments.comments.services.components import FeedbackData
@@ -47,9 +45,9 @@ class FeedbackServiceConfig(RecordServiceConfig):
     #
     # Record API configuration
     #
-    record_cls = CommentRecord
+    record_cls = None  # must be overridden
 
-    record_associated_cls = RDMRecord
+    record_associated_cls = None  # must be overridden
 
     #
     # Service configuration

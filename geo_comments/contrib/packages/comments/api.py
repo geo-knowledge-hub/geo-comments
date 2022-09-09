@@ -5,11 +5,8 @@
 # geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Comment type factories module."""
+"""API for the Packages API contrib."""
 
-from .factory import CommentTypeFactory, FeedbackTypeFactory
+from ..packages import package_comments
 
-__all__ = (
-    "CommentTypeFactory",
-    "FeedbackTypeFactory",
-)
+PackageComment = package_comments.comment_cls

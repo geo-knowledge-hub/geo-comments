@@ -27,15 +27,15 @@ recursive-include docs *.rst
 recursive-include docs *.json
 recursive-include docs *.yaml
 recursive-include docs Makefile
-recursive-include geo_feedback *.po *.pot *.mo
-recursive-include geo_feedback *.yaml *.py *.json
+recursive-include geo_comments *.po *.pot *.mo
+recursive-include geo_comments *.yaml *.py *.json
 recursive-include tests *.py *.csv *.json *.yaml
 
 # added by check-manifest
-recursive-include geo_feedback *.py
+recursive-include geo_comments *.py
 
 # added by check-manifest
 include *.py
 recursive-include docs *.json
 recursive-include docs *.yaml
-recursive-include geo_feedback *.json
+recursive-include geo_comments *.json

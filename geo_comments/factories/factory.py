@@ -5,23 +5,23 @@
 # geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
+"""Comment type factories."""
+
 from invenio_accounts.models import User as InvenioUser
 from invenio_db import db
+from invenio_records.models import RecordMetadataBase
 from invenio_records.systemfields import (
     ConstantField,
     DictField,
     ModelField,
     SystemFieldsMixin,
 )
-from invenio_records.models import RecordMetadataBase
 from invenio_records_resources.records.systemfields import IndexField
-
 from sqlalchemy_utils.types import UUIDType
 
+from geo_comments.comments.records.api import CommentRecordBase
 from geo_comments.comments.records.systemfields.fields.entity import EntityField
 from geo_comments.comments.records.systemfields.models import UserEntity
-
-from .base import CommentRecordBase
 
 
 #
@@ -48,7 +48,7 @@ class CommentTypeFactory:
         comment_type_name,
         comment_record_entity_cls,
         comment_associated_record_cls,
-        schema_path=None,
+        schema_path="local://comments/comment-v1.0.0.json",
         schema_version="1.0.0",
         comment_model_cls_attr=None,
         comment_record_cls_attr=None,
@@ -176,11 +176,12 @@ class FeedbackTypeFactory(CommentTypeFactory):
         comment_type_name,
         comment_record_entity_cls,
         comment_associated_record_cls,
-        schema_path=None,
+        schema_path="local://feedbacks/feedback-v1.0.0.json",
         schema_version="1.0.0",
         comment_model_cls_attr=None,
         index_name=None,
     ):
+        """Initializer."""
         comment_record_cls_attr = dict(
             topics=DictField("topics")
         )  # topics must be created using topics

@@ -16,7 +16,7 @@ from invenio_records_resources.services.uow import (
     unit_of_work,
 )
 
-from geo_comments.comments.records.models import CommentStatus
+from geo_comments.comments.records.api import CommentStatus
 from geo_comments.comments.services.links import ActionLinksTemplate
 
 

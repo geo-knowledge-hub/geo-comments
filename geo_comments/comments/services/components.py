@@ -11,7 +11,7 @@ from invenio_records_resources.services.records.components import (
     ServiceComponent as BaseServiceComponent,
 )
 
-from geo_comments.comments.records.models import CommentStatus
+from geo_comments.comments.records.api import CommentStatus
 
 
 class FeedbackComponentBase(BaseServiceComponent):

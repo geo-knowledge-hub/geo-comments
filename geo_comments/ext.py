@@ -38,10 +38,10 @@ class GEOComments(object):
 
     def init_services(self, app):
         """Initialize the services."""
-        self.feedback_service = FeedbackService(config=FeedbackServiceConfig)
+        self.comments_service = FeedbackService(config=FeedbackServiceConfig)
 
     def init_resources(self, app):
         """Initialize the resources."""
-        self.feedback_resource = CommentResource(
-            FeedbackResourceConfig, self.feedback_service
+        self.comments_resource = CommentResource(
+            FeedbackResourceConfig, self.comments_service
         )
