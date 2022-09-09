@@ -9,4 +9,4 @@
 Usage
 =====
 
-.. automodule:: geo_feedback
+.. automodule:: geo_comments

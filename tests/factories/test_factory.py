@@ -8,32 +8,42 @@
 """Factory tests."""
 
 import pytest
-
-from geo_comments.factories import CommentTypeFactory, FeedbackTypeFactory
-from geo_comments.comments.records.systemfields.models import RecordEntity
-
 from geo_rdm_records.modules.packages.records.models import GEOPackageRecordMetadata
 from invenio_rdm_records.records.models import RDMRecordMetadata as GEORecordMetadata
 
+from geo_comments.comments.records.systemfields.models import RecordEntity
+from geo_comments.factories import CommentTypeFactory, FeedbackTypeFactory
 
-def test_feedback_model_class_create():
+
+@pytest.mark.parametrize("type_factory,type_name", [(FeedbackTypeFactory, "ModelFeedbackTest"), (CommentTypeFactory, "ModelCommentTest")])
+def test_model_class_create(type_factory, type_name):
     """Test the creation of a modal class."""
     # Packages
-    package_feedbacks = FeedbackTypeFactory(
-        comment_type_name="PackageFeedbackTest",
+    type_name_ = type_name
+
+    type_name = f"Package{type_name_}"
+    type_expected = f"{type_name}Metadata"
+    type_table_expected = f"{type_name.lower()}_metadata"
+
+    package_feedbacks = type_factory(
+        comment_type_name=type_name,
         comment_record_entity_cls=RecordEntity,
         comment_associated_record_cls=GEOPackageRecordMetadata,
     )
 
-    assert package_feedbacks.model_cls.__name__ == "PackageFeedbackTestMetadata"
-    assert package_feedbacks.model_cls.__tablename__ == "packagefeedbacktest_metadata"
+    assert package_feedbacks.model_cls.__name__ == type_expected
+    assert package_feedbacks.model_cls.__tablename__ == type_table_expected
 
     # Resources
-    resource_feedbacks = FeedbackTypeFactory(
-        comment_type_name="ResourceFeedbackTest",
+    type_name = f"Resource{type_name_}"
+    type_expected = f"{type_name}Metadata"
+    type_table_expected = f"{type_name.lower()}_metadata"
+
+    resource_feedbacks = type_factory(
+        comment_type_name=type_name,
         comment_record_entity_cls=RecordEntity,
         comment_associated_record_cls=GEORecordMetadata,
     )
 
-    assert resource_feedbacks.model_cls.__name__ == "ResourceFeedbackTestMetadata"
-    assert resource_feedbacks.model_cls.__tablename__ == "resourcefeedbacktest_metadata"
+    assert resource_feedbacks.model_cls.__name__ == type_expected
+    assert resource_feedbacks.model_cls.__tablename__ == type_table_expected
