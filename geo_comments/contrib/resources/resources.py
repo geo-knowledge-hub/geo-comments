@@ -9,8 +9,9 @@
 
 from invenio_rdm_records.records.models import RDMRecordMetadata as GEORecordMetadata
 
-from geo_comments.comments.records.systemfields.models import RecordEntity
 from geo_comments.factories import CommentTypeFactory, FeedbackTypeFactory
+
+from .systemfield import RecordEntity
 
 #
 # Comment

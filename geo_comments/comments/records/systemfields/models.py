@@ -7,10 +7,7 @@
 
 """Comment entity abstraction fields."""
 
-from geo_rdm_records.modules.packages.records.api import GEOPackageRecord
-from geo_rdm_records.modules.resources.records.api import GEORecord
 from invenio_accounts.models import User as InvenioUser
-from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records.dictutils import dict_lookup
 
 
@@ -47,6 +44,38 @@ class EntityBase:
         return self._entity
 
 
+class BaseRecordEntity(EntityBase):
+    """Base Record entity abstraction class."""
+
+    entity_cls = None
+    """Record entity class."""
+
+    @classmethod
+    def from_object(cls, instance):
+        """Create a Record entity from an object."""
+        if type(instance) == dict:
+            record_identifier = dict_lookup(instance, "record_pid")
+            obj = cls.entity_cls.pid.resolve(record_identifier)
+
+        else:
+            # note: assuming the instance model class
+            # (in this case `FeedbackRecord`).
+            record_identifier = getattr(instance.model, "record_id")
+            obj = cls.entity_cls.get_record(record_identifier)
+
+        return (
+            cls(
+                entity=obj,
+            )
+            if record_identifier
+            else None
+        )
+
+    def dump(self):
+        """Dump the user entity as a dict."""
+        return {"record_pid": self._entity.pid.pid_value}
+
+
 class UserEntity(EntityBase):
     """User entity abstraction class."""
 
@@ -74,51 +103,3 @@ class UserEntity(EntityBase):
     def dump(self):
         """Dump the user entity as a dict."""
         return {"user_id": self._entity.id}
-
-
-class RecordEntity(EntityBase):
-    """Record entity abstraction class."""
-
-    entity_classes = [GEORecord, GEOPackageRecord]
-
-    @classmethod
-    def _resolve(cls, pid, op):
-        """Resolve object by id."""
-        # initial solution: enabling multi classes to be used.
-        # Is assumed that, every class on ``entity_classes``
-        # list is a ``Record`` instance with PID Data Descriptor.
-        for entity_class in cls.entity_classes:
-            try:
-                if op == "resolve":
-                    return entity_class.pid.resolve(pid, registered_only=True)
-
-                elif op == "read":
-                    return entity_class.get_record(pid)
-            except PIDDoesNotExistError:
-                pass
-            raise PIDDoesNotExistError(pid_type="recid", pid_value=pid)
-
-    @classmethod
-    def from_object(cls, instance):
-        """Create a Record entity from an object."""
-        if type(instance) == dict:
-            record_pid = dict_lookup(instance, "record_pid")
-            obj = cls._resolve(record_pid, "resolve")
-
-        else:
-            # note: assuming the instance model class
-            # (in this case `FeedbackRecord`).
-            record_id = getattr(instance.model, "record_id")
-            obj = cls._resolve(record_id, "read")
-
-        return (
-            cls(
-                entity=obj,
-            )
-            if record_id
-            else None
-        )
-
-    def dump(self):
-        """Dump the user entity as a dict."""
-        return {"record_pid": self._entity.pid.pid_value}

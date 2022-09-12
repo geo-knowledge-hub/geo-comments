@@ -24,7 +24,7 @@ request_read_args = request_parser(from_conf("request_read_args"), location="arg
 request_search_args = request_parser(from_conf("request_search_args"), location="args")
 
 request_comment_view_args = request_parser(
-    from_conf("request_feedback_view_args"), location="view_args"
+    from_conf("request_comment_view_args"), location="view_args"
 )
 
 #

@@ -11,12 +11,17 @@ import pytest
 from geo_rdm_records.modules.packages.records.models import GEOPackageRecordMetadata
 from invenio_rdm_records.records.models import RDMRecordMetadata as GEORecordMetadata
 
-from geo_comments.comments.records.systemfields.models import RecordEntity
 from geo_comments.factories import CommentTypeFactory, FeedbackTypeFactory
 
 
-@pytest.mark.parametrize("type_factory,type_name", [(FeedbackTypeFactory, "ModelFeedbackTest"), (CommentTypeFactory, "ModelCommentTest")])
-def test_model_class_create(type_factory, type_name):
+@pytest.mark.parametrize(
+    "type_factory,type_name",
+    [
+        (FeedbackTypeFactory, "ModelFeedbackTest"),
+        (CommentTypeFactory, "ModelCommentTest"),
+    ],
+)
+def test_model_class_create(type_factory, type_name, record_entity):
     """Test the creation of a modal class."""
     # Packages
     type_name_ = type_name
@@ -27,7 +32,7 @@ def test_model_class_create(type_factory, type_name):
 
     package_feedbacks = type_factory(
         comment_type_name=type_name,
-        comment_record_entity_cls=RecordEntity,
+        comment_record_entity_cls=record_entity,
         comment_associated_record_cls=GEOPackageRecordMetadata,
     )
 
@@ -41,7 +46,7 @@ def test_model_class_create(type_factory, type_name):
 
     resource_feedbacks = type_factory(
         comment_type_name=type_name,
-        comment_record_entity_cls=RecordEntity,
+        comment_record_entity_cls=record_entity,
         comment_associated_record_cls=GEORecordMetadata,
     )
 

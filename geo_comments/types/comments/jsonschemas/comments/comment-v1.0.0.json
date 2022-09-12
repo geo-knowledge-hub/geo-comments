@@ -20,7 +20,7 @@
       "type": "string"
     },
     "user_id": {
-      "$ref": "local://feedback/definitions-v1.0.0.json#/user"
+      "$ref": "local://comments/definitions-v1.0.0.json#/user"
     },
     "record_pid": {
       "type": "string"

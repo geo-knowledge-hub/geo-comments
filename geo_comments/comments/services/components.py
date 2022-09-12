@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2021 Group on Earth Observations (GEO).
+# Copyright (C) 2021-2022 Geo Secretariat.
 #
-# geo-feedback is free software; you can redistribute it and/or modify it
+# geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Feedback service components."""
+"""Comment service components."""
 
 from invenio_records_resources.services.records.components import (
     ServiceComponent as BaseServiceComponent,
@@ -14,8 +14,8 @@ from invenio_records_resources.services.records.components import (
 from geo_comments.comments.records.api import CommentStatus
 
 
-class FeedbackComponentBase(BaseServiceComponent):
-    """Base Feedback component."""
+class CommentComponentBase(BaseServiceComponent):
+    """Base Comment component."""
 
     def create(
         self,
@@ -29,55 +29,55 @@ class FeedbackComponentBase(BaseServiceComponent):
         """Create handler."""
         pass
 
-    def delete(self, identity, feedback=None, **kwargs):
+    def delete(self, identity, comment=None, **kwargs):
         """Delete handler."""
         pass
 
-    def update(self, identity, feedback=None, data=None):
+    def update(self, identity, comment=None, data=None):
         """Update handler."""
         pass
 
-    def change_feedback_state(self, identity, feedback=None, state=None, **kwargs):
+    def change_comment_state(self, identity, comment=None, state=None, **kwargs):
         """State handler."""
         pass
 
 
-class FeedbackData(FeedbackComponentBase):
-    """Component to fill feedback records."""
+class CommentData(CommentComponentBase):
+    """Component to fill comment records."""
 
     def create(
         self,
         identity,
-        feedback=None,
+        comment=None,
         data=None,
-        record=None,
+        associated_record=None,
         auto_approve=False,
         **kwargs
     ):
         """Create handler."""
         # adding data
-        feedback.update(data)
+        comment.update(data)
 
         # user and record
-        feedback.record = record.id
-        feedback.user = identity.user.id
+        comment.record = associated_record.id
+        comment.user = identity.user.id
 
         # checking auto approve
         if auto_approve:
-            feedback.status = CommentStatus.ALLOWED.value
+            comment.status = CommentStatus.ALLOWED.value
 
-    def update(self, identity, feedback=None, data=None):
+    def update(self, identity, comment=None, data=None):
         """Update handler."""
-        feedback.update(data)
+        comment.update(data)
 
-    def change_feedback_state(
+    def change_comment_state(
         self,
         identity,
-        feedback=None,
+        comment=None,
         state=None,
         data=None,
         auto_approve=False,
         **kwargs
     ):
         """State handler."""
-        feedback.status = data.value
+        comment.status = data.value

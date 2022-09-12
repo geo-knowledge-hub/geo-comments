@@ -19,7 +19,7 @@ from invenio_records.systemfields import (
 from invenio_records_resources.records.systemfields import IndexField
 from sqlalchemy_utils.types import UUIDType
 
-from geo_comments.comments.records.api import CommentRecordBase
+from geo_comments.comments.records.api import CommentRecordBase, CommentStatus
 from geo_comments.comments.records.systemfields.fields.entity import EntityField
 from geo_comments.comments.records.systemfields.models import UserEntity
 
@@ -107,22 +107,23 @@ class CommentTypeFactory:
             **self.comment_cls_attr,
         )
 
-        #
         # Users
-        #
         model_class_attributes["user"] = db.relationship(InvenioUser)
         model_class_attributes["user_id"] = db.Column(
             db.Integer, db.ForeignKey(InvenioUser.id)
         )
 
-        #
         # Record
-        #
         model_class_attributes["record"] = db.relationship(
             self.comment_associated_record_cls
         )
         model_class_attributes["record_id"] = db.Column(
             UUIDType, db.ForeignKey(self.comment_associated_record_cls.id)
+        )
+
+        # Comment
+        model_class_attributes["status"] = db.Column(
+            db.String, default=CommentStatus.DENIED.value
         )
 
         self.model_cls = type(

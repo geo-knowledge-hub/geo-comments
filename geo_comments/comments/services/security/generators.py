@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of GEO Knowledge Hub User's Feedback Component.
-# Copyright 2021 GEO Secretariat.
+# Copyright (C) 2021-2022 Geo Secretariat.
 #
-# GEO Knowledge Hub User's Feedback Component is free software; you can redistribute it and/or modify it
+# geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
-#
 
-"""Permission policy generators for the Feedback service."""
+"""Permission policy generators for the Comment Services."""
 
 import operator
 from functools import reduce
@@ -18,28 +16,6 @@ from geo_config.security.generators import GeoSecretariat as GeoSecretariatBaseG
 from geo_config.security.generators import IfIsEqual
 from invenio_access.permissions import authenticated_user
 from invenio_records_permissions.generators import Generator
-
-
-class GeoSecretariat(GeoSecretariatBaseGenerator):
-    """GEO Secretariat generator."""
-
-    def query_filter(self, identity=None, **kwargs):
-        """Filters for current identity as super user."""
-        return Q("match", **{"status": "D"}) | Q("match", **{"status": "A"})
-
-
-class FeedbackOwner(Generator):
-    """Feedback Owner generator."""
-
-    def needs(self, record=None, **kwargs):
-        """Enabling Needs."""
-        if not record:
-            return [authenticated_user]
-        return [UserNeed(record.get("user_id"))]
-
-    def query_filter(self, identity=None, **kwargs):
-        """Filters for current identity as super user."""
-        return Q("term", **{"user_id": identity.id})
 
 
 class IfDenied(IfIsEqual):
@@ -73,3 +49,25 @@ class IfDenied(IfIsEqual):
         else_query = self.make_query(self.else_, **kwargs)
 
         return (q_denied & then_query) | (q_allowed & else_query)
+
+
+class GeoSecretariat(GeoSecretariatBaseGenerator):
+    """GEO Secretariat generator."""
+
+    def query_filter(self, identity=None, **kwargs):
+        """Filters for current identity as super user."""
+        return Q("match", **{"status": "D"}) | Q("match", **{"status": "A"})
+
+
+class CommentOwner(Generator):
+    """Comment Owner generator."""
+
+    def needs(self, record=None, **kwargs):
+        """Enabling Needs."""
+        if not record:
+            return [authenticated_user]
+        return [UserNeed(record.get("user_id"))]
+
+    def query_filter(self, identity=None, **kwargs):
+        """Filters for current identity as super user."""
+        return Q("term", **{"user_id": identity.id})

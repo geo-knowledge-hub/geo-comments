@@ -9,8 +9,9 @@
 
 from geo_rdm_records.modules.packages.records.models import GEOPackageRecordMetadata
 
-from geo_comments.comments.records.systemfields.models import RecordEntity
 from geo_comments.factories import CommentTypeFactory, FeedbackTypeFactory
+
+from .systemfield import RecordEntity
 
 #
 # Comment

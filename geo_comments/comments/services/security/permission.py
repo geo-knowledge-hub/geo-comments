@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of GEO Knowledge Hub User's Feedback Component.
-# Copyright 2021 GEO Secretariat.
+# Copyright (C) 2021-2022 Geo Secretariat.
 #
-# GEO Knowledge Hub User's Feedback Component is free software; you can redistribute it and/or modify it
+# geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
-#
 
-"""Feedback permission policy."""
+"""Comment permission policy."""
 
 from geo_config.security.generators import GeoSecretariat
+from invenio_rdm_records.services.generators import (
+    CommunityAction,
+    RecordOwners,
+    SecretLinks,
+)
 from invenio_records_permissions.generators import AuthenticatedUser, SystemProcess
 from invenio_records_permissions.policies.records import RecordPermissionPolicy
 
-from geo_comments.comments.services.security.generators import FeedbackOwner, IfDenied
+from geo_comments.comments.services.security.generators import CommentOwner, IfDenied
 
 
 class FeedbackPermissionPolicy(RecordPermissionPolicy):
@@ -22,35 +25,43 @@ class FeedbackPermissionPolicy(RecordPermissionPolicy):
     #
     # High-level permissions
     #
-    can_use = [
-        IfDenied(
-            then_=[GeoSecretariat(), FeedbackOwner()],
-            else_=[AuthenticatedUser()],
-        ),
+
+    # Record related
+    can_view_associated_record = [
+        RecordOwners(),
+        SecretLinks("view"),
+        CommunityAction("view"),
     ]
 
-    can_curate = [GeoSecretariat(), SystemProcess()]
+    # Comment related
+    can_manage = [
+        RecordOwners(),
+        GeoSecretariat(),
+        CommunityAction("curate"),
+        SystemProcess(),
+    ]
 
-    can_manage = can_curate + [FeedbackOwner()]
+    can_curate = can_manage + [CommentOwner()]
+
+    can_view_comments = [AuthenticatedUser(), SystemProcess()]
+
+    can_authenticated = [AuthenticatedUser(), SystemProcess()]
 
     #
-    # User rating permissions
+    # Comments
     #
 
     # Allow record search
-    can_search = can_use
+    can_search = [IfDenied(then_=can_curate, else_=can_view_comments)]
 
     # Allow reading record metadata
-    can_read = can_use
+    can_read = [IfDenied(then_=can_curate, else_=can_view_comments)]
 
     # Allow submitting new record
-    can_create = can_use
+    can_create = can_authenticated
 
     # Allow editing published ratings
-    can_update = can_manage
+    can_update = can_curate
 
     # Allow deleting
-    can_delete = can_manage
-
-    # Allow approving/denying comments
-    can_change_state = can_curate
+    can_delete = can_curate

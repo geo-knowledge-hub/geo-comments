@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2021 Group on Earth Observations (GEO).
+# Copyright (C) 2021-2022 Geo Secretariat.
 #
-# geo-feedback is free software; you can redistribute it and/or modify it
+# geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Feedback Search Facets."""
+"""Comment Search Facets."""
 
 from flask_babelex import gettext as _
 from invenio_records_resources.services.records.facets import TermsFacet

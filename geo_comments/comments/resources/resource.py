@@ -83,7 +83,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
         """Read an item."""
         item = self.service.read(
             g.identity,
-            comment_id=resource_requestctx.view_args["fid"],
+            comment_id=resource_requestctx.view_args["comment_id"],
         )
 
         return item.to_dict(), 200
@@ -94,6 +94,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
         """Create an item."""
         item = self.service.create(
             g.identity,
+            resource_requestctx.view_args["pid_value"],
             resource_requestctx.data or {},
             auto_approve=current_app.config.get("GEO_COMMENT_AUTO_APPROVE", False),
         )
@@ -107,7 +108,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
         """Update an item."""
         item = self.service.update(
             identity=g.identity,
-            comment_id=resource_requestctx.view_args["fid"],
+            comment_id=resource_requestctx.view_args["comment_id"],
             data=resource_requestctx.data,
         )
         return item.to_dict(), 200
@@ -116,7 +117,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
     def delete(self):
         """Delete an item."""
         self.service.delete(
-            identity=g.identity, comment_id=resource_requestctx.view_args["fid"]
+            identity=g.identity, comment_id=resource_requestctx.view_args["comment_id"],
         )
         return "", 204
 
@@ -126,7 +127,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
     def deny_comment(self):
         """Deny comment."""
         denied_comment = self.service.deny_comment(
-            identity=g.identity, comment_id=resource_requestctx.view_args["fid"]
+            identity=g.identity, comment_id=resource_requestctx.view_args["comment_id"],
         )
 
         return denied_comment.to_dict(), 200
@@ -137,7 +138,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
     def allow_comment(self):
         """Allow comment."""
         allowed_comment = self.service.allow_comment(
-            identity=g.identity, comment_id=resource_requestctx.view_args["fid"]
+            identity=g.identity, comment_id=resource_requestctx.view_args["comment_id"],
         )
 
         return allowed_comment.to_dict(), 200

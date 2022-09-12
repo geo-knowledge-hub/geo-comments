@@ -17,10 +17,13 @@ from geo_rdm_records.modules.packages.records.api import (
 )
 from geo_rdm_records.modules.resources.records.api import GEODraft, GEORecord
 from invenio_access.models import ActionRoles
-from invenio_access.permissions import superuser_access
+from invenio_access.permissions import superuser_access, system_identity
 from invenio_accounts.models import Role
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api as _create_api
+from invenio_db import db
+from invenio_vocabularies.proxies import current_service as vocabulary_service
+from invenio_vocabularies.records.api import Vocabulary
 
 
 #
@@ -131,8 +134,14 @@ def client_logged_as(client, users):
 @pytest.fixture(scope="module")
 def comment_record_data():
     """Data to create a comment."""
+    return {"content": "A comment here"}
+
+
+@pytest.fixture(scope="module")
+def feedback_record_data():
+    """Data to create a feedback comment."""
     return {
-        "comment": "A comment here",
+        "content": "A comment here",
         "topics": [
             {"name": "Test A", "rating": 12.4},
             {"name": "Test B", "rating": 15.5},
@@ -143,6 +152,64 @@ def comment_record_data():
 #
 # Data fixtures
 #
+@pytest.fixture(scope="module")
+def resource_type_type(app):
+    """Resource type vocabulary type."""
+    return vocabulary_service.create_type(system_identity, "resourcetypes", "rsrct")
+
+
+@pytest.fixture(scope="module")
+def resource_type_v(app, resource_type_type):
+    """Resource type vocabulary record."""
+    vocabulary_service.create(
+        system_identity,
+        {  # create base resource type
+            "id": "image",
+            "props": {
+                "csl": "figure",
+                "datacite_general": "Image",
+                "datacite_type": "",
+                "openaire_resourceType": "25",
+                "openaire_type": "dataset",
+                "eurepo": "info:eu-repo/semantic/other",
+                "schema.org": "https://schema.org/ImageObject",
+                "subtype": "",
+                "type": "image",
+            },
+            "icon": "chart bar outline",
+            "title": {"en": "Image"},
+            "tags": ["depositable", "linkable"],
+            "type": "resourcetypes",
+        },
+    )
+
+    vocab = vocabulary_service.create(
+        system_identity,
+        {
+            "id": "image-photo",
+            "props": {
+                "csl": "graphic",
+                "datacite_general": "Image",
+                "datacite_type": "Photo",
+                "openaire_resourceType": "25",
+                "openaire_type": "dataset",
+                "eurepo": "info:eu-repo/semantic/other",
+                "schema.org": "https://schema.org/Photograph",
+                "subtype": "image-photo",
+                "type": "image",
+            },
+            "icon": "chart bar outline",
+            "title": {"en": "Photo"},
+            "tags": ["depositable", "linkable"],
+            "type": "resourcetypes",
+        },
+    )
+
+    Vocabulary.index.refresh()
+
+    return vocab
+
+
 @pytest.fixture(scope="module")
 def minimal_record():
     """Minimal record data as dict coming from the external world."""
@@ -156,15 +223,6 @@ def minimal_record():
             "enabled": False,  # Most tests don't care about files
         },
         "metadata": {
-            "target_audiences": [{"id": "tu-geo-eoanalyst"}],
-            "engagement_priorities": [
-                {
-                    "id": "convention-on-biological-diversity",
-                }
-            ],
-            "geo_work_programme_activity": {
-                "id": "geo-activities-geobon",
-            },
             "publication_date": "2020-06-01",
             "resource_type": {"id": "image-photo"},
             "creators": [
@@ -174,13 +232,7 @@ def minimal_record():
                         "given_name": "Troy",
                         "type": "personal",
                     }
-                },
-                {
-                    "person_or_org": {
-                        "name": "Troy Inc.",
-                        "type": "organizational",
-                    },
-                },
+                }
             ],
             "title": "A Romans story",
         },
@@ -188,18 +240,34 @@ def minimal_record():
 
 
 @pytest.fixture(scope="module")
-def record_rdm_simple(minimal_record):
-    """Basic RDM Record."""
+def record_resource_simple(minimal_record, location, resource_type_v):
+    """Basic Resource Record."""
     draft = GEODraft.create(minimal_record)
+    draft.commit()
+    db.session.commit()
+
     record = GEORecord.publish(draft)
+    record.commit()
+    db.session.commit()
+
+    GEODraft.index.refresh()
+    GEORecord.index.refresh()
 
     return record
 
 
 @pytest.fixture(scope="module")
-def record_package_simple(minimal_record):
+def record_package_simple(minimal_record, location, resource_type_v):
     """Basic Package Record."""
     draft = GEOPackageDraft.create(minimal_record)
+    draft.commit()
+    db.session.commit()
+
     record = GEOPackageRecord.publish(draft)
+    record.commit()
+    db.session.commit()
+
+    GEOPackageDraft.index.refresh()
+    GEOPackageRecord.index.refresh()
 
     return record

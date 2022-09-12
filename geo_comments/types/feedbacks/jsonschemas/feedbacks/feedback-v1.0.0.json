@@ -20,10 +20,10 @@
       "type": "string"
     },
     "topics": {
-      "$ref": "local://feedback/definitions-v1.0.0.json#/topics"
+      "$ref": "local://feedbacks/definitions-v1.0.0.json#/topics"
     },
     "user_id": {
-      "$ref": "local://feedback/definitions-v1.0.0.json#/user"
+      "$ref": "local://feedbacks/definitions-v1.0.0.json#/user"
     },
     "record_pid": {
       "type": "string"

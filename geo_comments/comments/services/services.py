@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2021 Group on Earth Observations (GEO).
+# Copyright (C) 2021-2022 Geo Secretariat.
 #
-# geo-feedback is free software; you can redistribute it and/or modify it
+# geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Feedback service."""
+"""Comment service."""
 
 from invenio_records_resources.services.records import (
     RecordService as InvenioBaseService,
@@ -20,8 +20,8 @@ from geo_comments.comments.records.api import CommentStatus
 from geo_comments.comments.services.links import ActionLinksTemplate
 
 
-class FeedbackService(InvenioBaseService):
-    """Feedback service class."""
+class CommentService(InvenioBaseService):
+    """Comment service class."""
 
     #
     # Properties
@@ -33,110 +33,125 @@ class FeedbackService(InvenioBaseService):
 
     @property
     def record_associated_cls(self):
-        """Class of a record associated to a feedback."""
+        """Class of a record associated to a comment."""
         return self.config.record_associated_cls
 
     #
     # Internal methods
     #
+    def _get_associated_record(self, record_id):
+        """Get associated request."""
+        return self.record_associated_cls.get_record(record_id)
+
+    def _get_comment(self, comment_id, with_deleted=True):
+        """Get associated event_id."""
+        return self.record_cls.get_record(comment_id, with_deleted=with_deleted)
+
     @unit_of_work()
-    def _change_feedback_status(self, identity, feedback_id, status, uow=None):
-        """Feedback status handler."""
+    def _change_comment_status(self, identity, comment_id, status, uow=None):
+        """Comment status handler."""
         self.require_permission(identity, "change_state")
 
         # searching
-        feedback = self.record_cls.get_record(id_=feedback_id, with_denied=True)
+        comment = self.record_cls.get_record(id_=comment_id, with_denied=True)
 
         # running the components
         self.run_components(
-            "change_feedback_state",
+            "change_comment_state",
             identity,
             data=status,
-            feedback=feedback,
+            comment=comment,
             uow=uow,
         )
 
-        uow.register(RecordCommitOp(feedback, self.indexer))
+        uow.register(RecordCommitOp(comment, self.indexer))
 
-        return self.result_item(self, identity, feedback, links_tpl=self.links_item_tpl)
+        return self.result_item(self, identity, comment, links_tpl=self.links_item_tpl)
 
     @unit_of_work()
     def _create(
         self,
         record_cls,
         identity,
+        associated_record,
         data,
         auto_approve=False,
         raise_errors=True,
         uow=None,
     ):
-        """Create a feedback record."""
-        self.require_permission(identity, "create")
+        """Create a comment record."""
+        self.require_permission(identity, "view_associated_record", record=associated_record)
 
         # checking schema
         data, errors = self.schema.load(
             data, context={"identity": identity}, raise_errors=raise_errors
         )
 
-        # creating an empty feedback
-        feedback = record_cls.create({})
-
-        # searching for feedback record
-        record_pid = data.get("record_pid")
-
-        record = self.record_associated_cls.pid.resolve(
-            record_pid, registered_only=True
-        )
+        # creating an empty comment
+        comment = record_cls.create({})
 
         # running the components
         self.run_components(
             "create",
             identity,
             data=data,
-            record=record,
-            feedback=feedback,
+            comment=comment,
             auto_approve=auto_approve,
+            associated_record=associated_record,
             errors=errors,
             uow=uow,
         )
 
         # Persist record (DB and index)
-        uow.register(RecordCommitOp(feedback, self.indexer))
+        uow.register(RecordCommitOp(comment, self.indexer))
 
         return self.result_item(
-            self, identity, feedback, links_tpl=self.links_item_tpl, errors=errors
+            self, identity, comment, links_tpl=self.links_item_tpl, errors=errors
         )
 
     #
     # High-level API.
     #
     @unit_of_work()
-    def create(self, identity, data, auto_approve=False, uow=None):
-        """Create a feedback record."""
+    def create(
+        self, identity, associated_record_id, data, auto_approve=False, uow=None
+    ):
+        """Create a comment record."""
+        associated_record = self._get_associated_record(associated_record_id)
+
         return self._create(
-            self.record_cls, identity, data, auto_approve=auto_approve, uow=uow
+            self.record_cls,
+            identity,
+            associated_record,
+            data,
+            auto_approve=auto_approve,
+            uow=uow,
         )
 
-    def read(self, identity, feedback_id, expand=False):
-        """Read a feedback matching the id."""
-        # reading the feedback
-        feedback = self.record_cls.get_record(id_=feedback_id, with_denied=True)
-        self.require_permission(identity, "read", record=feedback)
+    def read(self, identity, comment_id, expand=False):
+        """Read a comment matching the id."""
+        # reading the comment
+        comment = self.record_cls.get_record(id_=comment_id, with_denied=True)
+
+        # Permissions
+        self.require_permission(identity, "view_associated_record", record=comment.record)
+        self.require_permission(identity, "read", comment=comment)
 
         return self.result_item(
             self,
             identity,
-            feedback,
+            comment,
             links_tpl=self.links_item_tpl,
         )
 
     @unit_of_work()
-    def update(self, feedback_id, identity, data, uow=None):
+    def update(self, comment_id, identity, data, uow=None):
         """Replace a record."""
-        feedback = self.record_cls.get_record(id_=feedback_id)
+        comment = self.record_cls.get_record(id_=comment_id)
 
         # Permissions
-        self.require_permission(identity, "update", record=feedback)
+        self.require_permission(identity, "view_associated_record", record=comment.record)
+        self.require_permission(identity, "update", comment=comment)
 
         data, _ = self.schema.load(
             data,
@@ -148,51 +163,52 @@ class FeedbackService(InvenioBaseService):
             "update",
             identity,
             data=data,
-            feedback=feedback,
+            comment=comment,
             uow=uow,
         )
 
-        uow.register(RecordCommitOp(feedback, self.indexer))
+        uow.register(RecordCommitOp(comment, self.indexer))
 
         return self.result_item(
             self,
             identity,
-            feedback,
+            comment,
             links_tpl=self.links_item_tpl,
         )
 
     @unit_of_work()
-    def delete(self, feedback_id, identity, uow=None):
-        """Delete a feedback from database and search indexes."""
-        feedback = self.record_cls.get_record(id_=feedback_id)
+    def delete(self, comment_id, identity, uow=None):
+        """Delete a comment from database and search indexes."""
+        comment = self.record_cls.get_record(id_=comment_id)
 
         # Permissions
-        self.require_permission(identity, "delete", record=feedback)
+        self.require_permission(identity, "view_associated_record", record=comment.record)
+        self.require_permission(identity, "delete", comment=comment)
 
         # Run components
         self.run_components(
             "delete",
             identity,
-            feedback=feedback,
+            comment=comment,
             uow=uow,
         )
 
         uow.register(
-            RecordDeleteOp(feedback, self.indexer, index_refresh=True, force=True)
+            RecordDeleteOp(comment, self.indexer, index_refresh=True, force=True)
         )
 
         return True
 
     @unit_of_work()
-    def allow_feedback(self, identity, feedback_id, uow=None):
-        """Allow feedback."""
-        return self._change_feedback_status(
-            identity, feedback_id, CommentStatus.ALLOWED, uow=uow
+    def allow_comment(self, identity, comment_id, uow=None):
+        """Allow comment."""
+        return self._change_comment_status(
+            identity, comment_id, CommentStatus.ALLOWED, uow=uow
         )
 
     @unit_of_work()
-    def deny_feedback(self, identity, feedback_id, uow=None):
-        """Deny feedback."""
-        return self._change_feedback_status(
-            identity, feedback_id, CommentStatus.DENIED, uow=uow
+    def deny_comment(self, identity, comment_id, uow=None):
+        """Deny comment."""
+        return self._change_comment_status(
+            identity, comment_id, CommentStatus.DENIED, uow=uow
         )

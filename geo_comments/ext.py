@@ -8,10 +8,16 @@
 """Comments module for GEO Knowledge Hub."""
 
 from geo_comments import config
-from geo_comments.comments.resources.config import FeedbackResourceConfig
+from geo_comments.comments.resources.config import (
+    CommentResourceConfig,
+    FeedbackResourceConfig,
+)
 from geo_comments.comments.resources.resource import CommentResource
-from geo_comments.comments.services.config import FeedbackServiceConfig
-from geo_comments.comments.services.services import FeedbackService
+from geo_comments.comments.services.config import (
+    CommentServiceConfig,
+    FeedbackServiceConfig,
+)
+from geo_comments.comments.services.services import CommentService
 
 
 class GEOComments(object):
@@ -38,10 +44,15 @@ class GEOComments(object):
 
     def init_services(self, app):
         """Initialize the services."""
-        self.comments_service = FeedbackService(config=FeedbackServiceConfig)
+        self.comments_service = CommentService(config=CommentServiceConfig)
+        self.feedbacks_service = CommentService(config=FeedbackServiceConfig)
 
     def init_resources(self, app):
         """Initialize the resources."""
         self.comments_resource = CommentResource(
-            FeedbackResourceConfig, self.comments_service
+            CommentResourceConfig, self.comments_service
+        )
+
+        self.feedbacks_resource = CommentResource(
+            FeedbackResourceConfig, self.feedbacks_service
         )

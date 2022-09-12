@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2021 Group on Earth Observations (GEO).
+# Copyright (C) 2021-2022 Geo Secretariat.
 #
-# geo-feedback is free software; you can redistribute it and/or modify it
+# geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Feedback service config."""
+"""Comment service config."""
 
 from invenio_records_resources.services.records.config import (
     RecordServiceConfig,
@@ -14,23 +14,23 @@ from invenio_records_resources.services.records.config import (
 from invenio_records_resources.services.records.links import pagination_links
 from invenio_records_resources.services.records.results import RecordItem, RecordList
 
-from geo_comments.comments.schema import CommentSchema
+from geo_comments.comments.schema import CommentSchema, FeedbackCommentSchema
 from geo_comments.comments.services import facets
-from geo_comments.comments.services.components import FeedbackData
-from geo_comments.comments.services.links import FeedbackLink
+from geo_comments.comments.services.components import CommentData
+from geo_comments.comments.services.links import CommentLink
 from geo_comments.comments.services.security.permission import FeedbackPermissionPolicy
 
 
-class FeedbackSearchOptions(SearchOptions):
-    """Search Options for the Feedback."""
+class CommentSearchOptions(SearchOptions):
+    """Search Options."""
 
     facets = {"status": facets.status, "record": facets.record}
 
 
-class FeedbackServiceConfig(RecordServiceConfig):
-    """Feedback service configuration."""
+class BaseCommentServiceConfig(RecordServiceConfig):
+    """Comment Service configuration."""
 
-    schema = CommentSchema
+    schema = None
 
     #
     # Common configurations
@@ -40,7 +40,7 @@ class FeedbackServiceConfig(RecordServiceConfig):
     #
     # Search configurations
     #
-    search = FeedbackSearchOptions
+    search = CommentSearchOptions
 
     #
     # Record API configuration
@@ -49,25 +49,57 @@ class FeedbackServiceConfig(RecordServiceConfig):
 
     record_associated_cls = None  # must be overridden
 
-    #
-    # Service configuration
-    #
-    links_item = {"self": FeedbackLink("{+api}/feedbacks?q=id:{id}")}
-
-    links_search = pagination_links("{+api}/feedbacks{?args*}")
-
-    links_action = {
-        "allow": FeedbackLink(
-            "{+api}/feedbacks/actions/allow?q=id:{id}",
-        ),
-        "deny": FeedbackLink(
-            "{+api}/feedbacks/actions/deny?q=id:{id}",
-        ),
-    }
-
     # Results
     result_item_cls = RecordItem
     result_list_cls = RecordList
 
     # Components
-    components = [FeedbackData]
+    components = [CommentData]
+
+
+class CommentServiceConfig(RecordServiceConfig):
+    """Comment Service configuration."""
+
+    service_id = "comment_service"
+
+    schema = CommentSchema
+
+    #
+    # Service configuration
+    #
+    links_item = {"self": CommentLink("{+api}/comments?q=id:{id}")}
+
+    links_search = pagination_links("{+api}/comments{?args*}")
+
+    links_action = {
+        "allow": CommentLink(
+            "{+api}/comments/actions/allow?q=id:{id}",
+        ),
+        "deny": CommentLink(
+            "{+api}/comments/actions/deny?q=id:{id}",
+        ),
+    }
+
+
+class FeedbackServiceConfig(RecordServiceConfig):
+    """Feedback Service configuration."""
+
+    service_id = "feedback_service"
+
+    schema = FeedbackCommentSchema
+
+    #
+    # Service configuration
+    #
+    links_item = {"self": CommentLink("{+api}/feedbacks?q=id:{id}")}
+
+    links_search = pagination_links("{+api}/feedbacks{?args*}")
+
+    links_action = {
+        "allow": CommentLink(
+            "{+api}/feedbacks/actions/allow?q=id:{id}",
+        ),
+        "deny": CommentLink(
+            "{+api}/feedbacks/actions/deny?q=id:{id}",
+        ),
+    }
