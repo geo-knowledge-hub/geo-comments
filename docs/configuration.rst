@@ -9,5 +9,5 @@
 Configuration
 =============
 
-.. automodule:: geo_feedback.config
+.. automodule:: geo_comments.config
    :members:

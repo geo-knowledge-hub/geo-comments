@@ -13,7 +13,7 @@ import os
 
 import sphinx.environment
 
-from geo_feedback import __version__
+from geo_comments import __version__
 
 # -- General configuration ------------------------------------------------
 

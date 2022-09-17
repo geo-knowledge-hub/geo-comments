@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "local://feedbacks/feedback-v1.0.0.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "$ref": "local://definitions-v1.0.0.json#/$schema"
+    },
+    "id": {
+      "$ref": "local://definitions-v1.0.0.json#/identifier"
+    },
+    "status": {
+      "description": "Feedback status.",
+      "type": "string",
+      "enum": ["A", "D"]
+    },
+    "content": {
+      "description": "Description for record (may contain HTML).",
+      "type": "string"
+    },
+    "topics": {
+      "$ref": "local://feedbacks/definitions-v1.0.0.json#/topics"
+    },
+    "user_id": {
+      "$ref": "local://comments/definitions-v1.0.0.json#/user"
+    },
+    "record_pid": {
+      "type": "string"
+    }
+  }
+}

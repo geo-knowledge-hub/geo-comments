@@ -9,11 +9,11 @@
 API Docs
 ========
 
-.. automodule:: geo_feedback.ext
+.. automodule:: geo_comments.ext
    :members:
 
 Views
 -----
 
-.. automodule:: geo_feedback.views
+.. automodule:: geo_comments.views
    :members:
