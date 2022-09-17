@@ -11,11 +11,11 @@ import pytest
 from flask_principal import Identity, Need, UserNeed
 from flask_security import login_user
 from flask_security.utils import hash_password
+from geo_rdm_records.customizations.records.api import GEODraft, GEORecord
 from geo_rdm_records.modules.packages.records.api import (
     GEOPackageDraft,
     GEOPackageRecord,
 )
-from geo_rdm_records.modules.resources.records.api import GEODraft, GEORecord
 from invenio_access.models import ActionRoles
 from invenio_access.permissions import superuser_access, system_identity
 from invenio_accounts.models import Role
