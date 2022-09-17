@@ -8,8 +8,29 @@
 """Comments module for Geo Knowledge Hub."""
 
 
-def create_comments_api_blueprint(app):
-    """Create GEO Knowledge Hub API blueprint."""
+def create_package_comment_api_blueprint(app):
+    """Create the Package comments API Blueprint."""
     ext = app.extensions["geo-comments"]
 
-    return ext.comments_resource.as_blueprint()
+    return ext.package_comment_resource.as_blueprint()
+
+
+def create_package_feedback_api_blueprint(app):
+    """Create the Package comments API Blueprint."""
+    ext = app.extensions["geo-comments"]
+
+    return ext.package_feedback_resource.as_blueprint()
+
+
+def create_resource_comment_api_blueprint(app):
+    """Create the Package's resource comments API Blueprint."""
+    ext = app.extensions["geo-comments"]
+
+    return ext.resource_comment_resource.as_blueprint()
+
+
+def create_resource_feedback_api_blueprint(app):
+    """Create the Package's resource feedbacks API Blueprint."""
+    ext = app.extensions["geo-comments"]
+
+    return ext.resource_feedback_resource.as_blueprint()

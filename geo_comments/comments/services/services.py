@@ -80,7 +80,9 @@ class CommentService(InvenioBaseService):
         uow=None,
     ):
         """Create a comment record."""
-        self.require_permission(identity, "view_associated_record", record=associated_record)
+        self.require_permission(
+            identity, "view_associated_record", record=associated_record
+        )
 
         # checking schema
         data, errors = self.schema.load(
@@ -134,7 +136,9 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id, with_denied=True)
 
         # Permissions
-        self.require_permission(identity, "view_associated_record", record=comment.record)
+        self.require_permission(
+            identity, "view_associated_record", record=comment.record
+        )
         self.require_permission(identity, "read", comment=comment)
 
         return self.result_item(
@@ -150,7 +154,9 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id)
 
         # Permissions
-        self.require_permission(identity, "view_associated_record", record=comment.record)
+        self.require_permission(
+            identity, "view_associated_record", record=comment.record
+        )
         self.require_permission(identity, "update", comment=comment)
 
         data, _ = self.schema.load(
@@ -182,7 +188,9 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id)
 
         # Permissions
-        self.require_permission(identity, "view_associated_record", record=comment.record)
+        self.require_permission(
+            identity, "view_associated_record", record=comment.record
+        )
         self.require_permission(identity, "delete", comment=comment)
 
         # Run components

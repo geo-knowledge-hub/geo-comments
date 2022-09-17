@@ -19,7 +19,7 @@ from invenio_records_permissions.policies.records import RecordPermissionPolicy
 from geo_comments.comments.services.security.generators import CommentOwner, IfDenied
 
 
-class FeedbackPermissionPolicy(RecordPermissionPolicy):
+class CommentPermissionPolicy(RecordPermissionPolicy):
     """Feedback permission policy."""
 
     #

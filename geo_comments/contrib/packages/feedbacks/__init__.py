@@ -6,3 +6,13 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """GEO Comments contrib module to support feedback in the Packages API."""
+
+from .resource import PackageFeedbackResource, PackageFeedbackResourceConfig
+from .service import PackageFeedbackService, PackageFeedbackServiceConfig
+
+__all__ = (
+    "PackageFeedbackResource",
+    "PackageFeedbackResourceConfig",
+    "PackageFeedbackService",
+    "PackageFeedbackServiceConfig",
+)

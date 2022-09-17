@@ -117,7 +117,8 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
     def delete(self):
         """Delete an item."""
         self.service.delete(
-            identity=g.identity, comment_id=resource_requestctx.view_args["comment_id"],
+            identity=g.identity,
+            comment_id=resource_requestctx.view_args["comment_id"],
         )
         return "", 204
 
@@ -127,7 +128,8 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
     def deny_comment(self):
         """Deny comment."""
         denied_comment = self.service.deny_comment(
-            identity=g.identity, comment_id=resource_requestctx.view_args["comment_id"],
+            identity=g.identity,
+            comment_id=resource_requestctx.view_args["comment_id"],
         )
 
         return denied_comment.to_dict(), 200
@@ -138,7 +140,8 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
     def allow_comment(self):
         """Allow comment."""
         allowed_comment = self.service.allow_comment(
-            identity=g.identity, comment_id=resource_requestctx.view_args["comment_id"],
+            identity=g.identity,
+            comment_id=resource_requestctx.view_args["comment_id"],
         )
 
         return allowed_comment.to_dict(), 200

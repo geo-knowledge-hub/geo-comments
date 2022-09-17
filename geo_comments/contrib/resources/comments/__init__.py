@@ -6,3 +6,13 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """GEO Comments contrib module to support comments in the Records API."""
+
+from .resource import ResourceCommentResource, ResourceCommentResourceConfig
+from .service import ResourceCommentService, ResourceCommentServiceConfig
+
+__all__ = (
+    "ResourceCommentResource",
+    "ResourceCommentResourceConfig",
+    "ResourceCommentService",
+    "ResourceCommentServiceConfig",
+)

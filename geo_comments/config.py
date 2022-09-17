@@ -7,5 +7,5 @@
 
 """Comments module configuration."""
 
-GEO_COMMENTS_AUTO_APPROVE = True
+GEO_COMMENTS_AUTO_APPROVE = False
 """Enable automatic comment approval"""

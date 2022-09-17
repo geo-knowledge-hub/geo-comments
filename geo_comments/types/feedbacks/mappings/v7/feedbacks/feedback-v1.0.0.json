@@ -9,7 +9,7 @@
       "status": {
         "type": "keyword"
       },
-      "comment": {
+      "content": {
         "type": "text"
       },
       "record_pid": {

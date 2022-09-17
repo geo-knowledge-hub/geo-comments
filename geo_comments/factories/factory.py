@@ -17,11 +17,19 @@ from invenio_records.systemfields import (
     SystemFieldsMixin,
 )
 from invenio_records_resources.records.systemfields import IndexField
+from invenio_records_resources.services import pagination_links
 from sqlalchemy_utils.types import UUIDType
 
 from geo_comments.comments.records.api import CommentRecordBase, CommentStatus
 from geo_comments.comments.records.systemfields.fields.entity import EntityField
 from geo_comments.comments.records.systemfields.models import UserEntity
+from geo_comments.comments.resources.config import CommentResourceConfig
+from geo_comments.comments.resources.resource import CommentResource
+from geo_comments.comments.schema import CommentSchema, FeedbackCommentSchema
+from geo_comments.comments.services.config import CommentServiceConfig
+from geo_comments.comments.services.links import CommentLink
+from geo_comments.comments.services.security.permission import CommentPermissionPolicy
+from geo_comments.comments.services.services import CommentService
 
 
 #
@@ -52,7 +60,15 @@ class CommentTypeFactory:
         schema_version="1.0.0",
         comment_model_cls_attr=None,
         comment_record_cls_attr=None,
-        index_name=None,
+        comment_service_name=None,
+        comment_service_permission_policy=None,
+        comment_service_endpoint_route=None,
+        comment_service_endpoint_route_prefix=None,
+        comment_service_search_options=None,
+        comment_service_schema=CommentSchema,
+        comment_service_components=None,
+        comment_service_id=None,
+        index_name="comments-comment-v1.0.0",
     ):
         """Initializer."""
         # comment definitions
@@ -61,7 +77,7 @@ class CommentTypeFactory:
         self.name_plural = f"{self.comment_name_lower}s"
 
         # comment classes
-        self.comment_cls_attr = comment_model_cls_attr or {}
+        self.comment_model_cls_attr = comment_model_cls_attr or {}
         self.comment_record_cls_attr = comment_record_cls_attr or {}
         self.comment_record_entity_cls = comment_record_entity_cls
         self.comment_associated_record_cls = comment_associated_record_cls
@@ -70,6 +86,22 @@ class CommentTypeFactory:
         self.schema_version = schema_version
         self.index_name = self._build_index_name(index_name)
         self.schema_path = self._build_schema_path(schema_path)
+
+        # service and resources classes
+        self.comment_service_cls = None
+        self.comment_service_cls_config = None
+
+        self.comment_service_endpoint_route = comment_service_endpoint_route
+        self.comment_service_endpoint_route_prefix = (
+            comment_service_endpoint_route_prefix
+        )
+
+        self.comment_service_id = comment_service_id
+        self.comment_service_name = comment_service_name
+        self.comment_service_permission_policy = comment_service_permission_policy
+        self.comment_service_search_options = comment_service_search_options
+        self.comment_service_schema = comment_service_schema
+        self.comment_service_components = comment_service_components
 
         # operating!
         self.create_comment_type()
@@ -98,13 +130,14 @@ class CommentTypeFactory:
         """Create the record type."""
         self.create_metadata_model()
         self.create_record_class()
+        self.create_resource_class()
+        self.create_service_class()
 
     def create_metadata_model(self):
         """Create metadata model."""
         model_class_attributes = dict(
             __tablename__=f"{self.comment_name_lower}_metadata",
-            __table_args__=(db.UniqueConstraint("user_id", "record_id"),),
-            **self.comment_cls_attr,
+            **self.comment_model_cls_attr,
         )
 
         # Users
@@ -165,6 +198,85 @@ class CommentTypeFactory:
             record_class_attributes,
         )
 
+    def create_resource_class(self):
+        """Create resource class."""
+        resource_config_cls_name = f"{self.comment_type_name}ResourceConfig"
+        resource_cls_name = f"{self.comment_type_name}Resource"
+
+        route = self.comment_service_endpoint_route or f"/{self.comment_name_lower}s"
+
+        config_cls_attributes = dict(
+            blueprint_name=self.comment_name_lower,
+            url_prefix=self.comment_service_endpoint_route_prefix
+            or f"/{self.comment_name_lower}s",
+            routes={
+                # General routes
+                "list": "/<pid_value>/" + route,
+                "item": "/<pid_value>/" + route + "/<comment_id>",
+                # Admin routes
+                "deny-item": "/<pid_value>/" + route + "/<comment_id>/actions/deny",
+                "allow-item": "/<pid_value>/" + route + "/<comment_id>/actions/allow",
+            },
+            **self.comment_model_cls_attr,
+        )
+
+        self.resource_config_cls = type(
+            resource_config_cls_name,
+            (CommentResourceConfig,),
+            config_cls_attributes,
+        )
+
+        self.resource_cls = type(resource_cls_name, (CommentResource,), {})
+
+    def create_service_class(self):
+        """Create a service class."""
+        config_cls_name = f"{self.comment_service_name}ServiceConfig"
+        service_cls_name = f"{self.comment_service_name}Service"
+        permission_policy_cls_name = f"{self.comment_service_name}PermissionPolicy"
+
+        if not self.comment_service_permission_policy:
+            self.comment_service_permission_policy = type(
+                permission_policy_cls_name, (CommentPermissionPolicy,), {}
+            )
+
+        route = self.comment_service_endpoint_route or f"/{self.comment_name_lower}s"
+
+        config_cls_attributes = dict(
+            permission_policy_cls=self.comment_service_permission_policy,
+            record_cls=self.comment_cls,
+            search=self.comment_service_search_options,
+            schema=self.comment_service_schema,
+            links_item={"self": CommentLink("{+api}/" + route + "?q=id:{id}")},
+            links_search=pagination_links("{+api}/" + route + "{?args*}"),
+            links_action={
+                "allow": CommentLink(
+                    "{+api}/" + route + "/actions/allow?q=id:{id}",
+                ),
+                "deny": CommentLink(
+                    "{+api}/" + route + "/actions/deny?q=id:{id}",
+                ),
+            },
+        )
+
+        if self.comment_service_components:
+            config_cls_attributes.update(
+                dict(components=self.comment_service_components)
+            )
+
+        if self.comment_service_id:
+            config_cls_attributes.update(
+                dict(
+                    service_id=self.comment_service_id,
+                    indexer_queue_name=self.comment_service_id,
+                )
+            )
+
+        self.comment_service_cls_config = type(
+            config_cls_name, (CommentServiceConfig,), config_cls_attributes
+        )
+
+        self.comment_service_cls = type(service_cls_name, (CommentService,), {})
+
 
 #
 # Specialized comment factories
@@ -177,23 +289,33 @@ class FeedbackTypeFactory(CommentTypeFactory):
         comment_type_name,
         comment_record_entity_cls,
         comment_associated_record_cls,
-        schema_path="local://feedbacks/feedback-v1.0.0.json",
-        schema_version="1.0.0",
-        comment_model_cls_attr=None,
-        index_name=None,
+        **kwargs,
     ):
         """Initializer."""
-        comment_record_cls_attr = dict(
-            topics=DictField("topics")
-        )  # topics must be created using topics
+        # Defining the properties to create a feedback specialized comment type
+
+        # Index name
+        index_name = "feedbacks-feedback-v1.0.0"
+
+        # Schema path
+        schema_path = "local://feedbacks/feedback-v1.0.0.json"
+
+        # Topics support (Only for feedbacks)
+        comment_record_cls_attr = dict(topics=DictField("topics"))
+
+        # Users can send only one feedback
+        comment_model_cls_attr = dict(
+            __table_args__=(db.UniqueConstraint("user_id", "record_id"),),
+        )
 
         super().__init__(
             comment_type_name,
             comment_record_entity_cls,
             comment_associated_record_cls,
-            schema_path,
-            schema_version,
-            comment_model_cls_attr,
-            comment_record_cls_attr,
-            index_name,
+            index_name=index_name,
+            schema_path=schema_path,
+            comment_record_cls_attr=comment_record_cls_attr,
+            comment_model_cls_attr=comment_model_cls_attr,
+            comment_service_schema=FeedbackCommentSchema,
+            **kwargs,
         )

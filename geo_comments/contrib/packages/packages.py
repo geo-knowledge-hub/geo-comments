@@ -20,6 +20,7 @@ package_comments = CommentTypeFactory(
     comment_type_name="PackageComment",
     comment_record_entity_cls=RecordEntity,
     comment_associated_record_cls=GEOPackageRecordMetadata,
+    comment_service_id="package_comments",
 )
 
 #
@@ -29,4 +30,5 @@ package_feedbacks = FeedbackTypeFactory(
     comment_type_name="PackageFeedback",
     comment_record_entity_cls=RecordEntity,
     comment_associated_record_cls=GEOPackageRecordMetadata,
+    comment_service_id="package_feedback",
 )

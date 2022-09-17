@@ -8,16 +8,30 @@
 """Comments module for GEO Knowledge Hub."""
 
 from geo_comments import config
-from geo_comments.comments.resources.config import (
-    CommentResourceConfig,
-    FeedbackResourceConfig,
+from geo_comments.contrib.packages.comments import (
+    PackageCommentResource,
+    PackageCommentResourceConfig,
+    PackageCommentService,
+    PackageCommentServiceConfig,
 )
-from geo_comments.comments.resources.resource import CommentResource
-from geo_comments.comments.services.config import (
-    CommentServiceConfig,
-    FeedbackServiceConfig,
+from geo_comments.contrib.packages.feedbacks import (
+    PackageFeedbackResource,
+    PackageFeedbackResourceConfig,
+    PackageFeedbackService,
+    PackageFeedbackServiceConfig,
 )
-from geo_comments.comments.services.services import CommentService
+from geo_comments.contrib.resources.comments import (
+    ResourceCommentResource,
+    ResourceCommentResourceConfig,
+    ResourceCommentService,
+    ResourceCommentServiceConfig,
+)
+from geo_comments.contrib.resources.feedbacks import (
+    ResourceFeedbackResource,
+    ResourceFeedbackResourceConfig,
+    ResourceFeedbackService,
+    ResourceFeedbackServiceConfig,
+)
 
 
 class GEOComments(object):
@@ -44,15 +58,33 @@ class GEOComments(object):
 
     def init_services(self, app):
         """Initialize the services."""
-        self.comments_service = CommentService(config=CommentServiceConfig)
-        self.feedbacks_service = CommentService(config=FeedbackServiceConfig)
+        self.package_comment_service = PackageCommentService(
+            config=PackageCommentServiceConfig
+        )
+        self.package_feedback_service = PackageFeedbackService(
+            config=PackageFeedbackServiceConfig
+        )
+
+        self.resource_comment_service = ResourceCommentService(
+            config=ResourceCommentServiceConfig
+        )
+        self.resource_feedback_service = ResourceFeedbackService(
+            config=ResourceFeedbackServiceConfig
+        )
 
     def init_resources(self, app):
         """Initialize the resources."""
-        self.comments_resource = CommentResource(
-            CommentResourceConfig, self.comments_service
+        self.package_comment_resource = PackageCommentResource(
+            service=self.package_comment_service, config=PackageCommentResourceConfig
+        )
+        self.package_feedback_resource = PackageFeedbackResource(
+            service=self.package_feedback_service, config=PackageFeedbackResourceConfig
         )
 
-        self.feedbacks_resource = CommentResource(
-            FeedbackResourceConfig, self.feedbacks_service
+        self.resource_comment_resource = ResourceCommentResource(
+            service=self.resource_comment_service, config=ResourceCommentResourceConfig
+        )
+        self.resource_feedback_resource = ResourceFeedbackResource(
+            service=self.resource_feedback_service,
+            config=ResourceFeedbackResourceConfig,
         )
