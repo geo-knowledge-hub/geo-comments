@@ -35,7 +35,7 @@ def test_model_class_create(type_factory, type_name, record_entity):
         comment_type_name=type_name,
         comment_record_entity_cls=record_entity,
         comment_associated_record_cls=GEOPackageRecord,
-        comment_associated_metadata_cls=GEOPackageRecordMetadata
+        comment_associated_metadata_cls=GEOPackageRecordMetadata,
     )
 
     assert package_feedbacks.model_cls.__name__ == type_expected
@@ -50,7 +50,7 @@ def test_model_class_create(type_factory, type_name, record_entity):
         comment_type_name=type_name,
         comment_record_entity_cls=record_entity,
         comment_associated_record_cls=GEOPackageRecord,
-        comment_associated_metadata_cls=GEOPackageRecordMetadata
+        comment_associated_metadata_cls=GEOPackageRecordMetadata,
     )
 
     assert resource_feedbacks.model_cls.__name__ == type_expected

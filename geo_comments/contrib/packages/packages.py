@@ -23,6 +23,9 @@ package_comments = CommentTypeFactory(
     comment_associated_record_cls=GEOPackageRecord,
     comment_associated_metadata_cls=GEOPackageRecordMetadata,
     comment_service_id="package_comments",
+    comment_service_name="PackageComments",
+    comment_service_endpoint_route="/comments",
+    comment_service_endpoint_route_prefix="/packages",
 )
 
 #
@@ -34,4 +37,7 @@ package_feedbacks = FeedbackTypeFactory(
     comment_associated_record_cls=GEOPackageRecord,
     comment_associated_metadata_cls=GEOPackageRecordMetadata,
     comment_service_id="package_feedback",
+    comment_service_name="PackageFeedback",
+    comment_service_endpoint_route="/feedbacks",
+    comment_service_endpoint_route_prefix="/packages",
 )

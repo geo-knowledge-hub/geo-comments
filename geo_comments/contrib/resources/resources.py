@@ -23,6 +23,9 @@ resource_comments = CommentTypeFactory(
     comment_associated_record_cls=GEORecord,
     comment_associated_metadata_cls=GEORecordMetadata,
     comment_service_id="resource_comment",
+    comment_service_name="ResourceComment",
+    comment_service_endpoint_route="/comments",
+    comment_service_endpoint_route_prefix="/records",
 )
 
 #
@@ -34,4 +37,7 @@ resource_feedbacks = FeedbackTypeFactory(
     comment_associated_record_cls=GEORecord,
     comment_associated_metadata_cls=GEORecordMetadata,
     comment_service_id="resource_feedback",
+    comment_service_name="ResourceFeedback",
+    comment_service_endpoint_route="/feedbacks",
+    comment_service_endpoint_route_prefix="/records",
 )

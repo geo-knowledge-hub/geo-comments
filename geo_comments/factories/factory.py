@@ -210,6 +210,7 @@ class CommentTypeFactory:
         resource_cls_name = f"{self.comment_type_name}Resource"
 
         route = self.comment_service_endpoint_route or f"/{self.comment_name_lower}s"
+        route = "{pid_value}" + route
 
         config_cls_attributes = dict(
             blueprint_name=self.comment_name_lower,
@@ -217,11 +218,11 @@ class CommentTypeFactory:
             or f"/{self.comment_name_lower}s",
             routes={
                 # General routes
-                "list": "/<pid_value>/" + route,
-                "item": "/<pid_value>/" + route + "/<comment_id>",
+                "list": route,
+                "item": route + "/{comment_id}",
                 # Admin routes
-                "deny-item": "/<pid_value>/" + route + "/<comment_id>/actions/deny",
-                "allow-item": "/<pid_value>/" + route + "/<comment_id>/actions/allow",
+                "deny-item": route + "/{comment_id}/actions/deny",
+                "allow-item": route + "/{comment_id}/actions/allow",
             },
             **self.comment_model_cls_attr,
         )
@@ -245,7 +246,12 @@ class CommentTypeFactory:
                 permission_policy_cls_name, (CommentPermissionPolicy,), {}
             )
 
+        route_prefix = self.comment_service_endpoint_route_prefix or ""
+        route_prefix = f"{route_prefix}/" if route_prefix else ""
+
         route = self.comment_service_endpoint_route or f"/{self.comment_name_lower}s"
+        route = "{pid_value}" + route
+        route = route_prefix + route
 
         config_cls_attributes = dict(
             permission_policy_cls=self.comment_service_permission_policy,
@@ -253,14 +259,14 @@ class CommentTypeFactory:
             record_associated_cls=self.comment_associated_record_cls,
             search=self.comment_service_search_options,
             schema=self.comment_service_schema,
-            links_item={"self": CommentLink("{+api}/" + route + "?q=id:{id}")},
-            links_search=pagination_links("{+api}/" + route + "{?args*}"),
+            links_item={"self": CommentLink("{+api}" + route + "/{comment_id}")},
+            links_search=pagination_links("{+api}" + route + "{?args*}"),
             links_action={
                 "allow": CommentLink(
-                    "{+api}/" + route + "/actions/allow?q=id:{id}",
+                    "{+api}" + route + "/{comment_id}/actions/allow",
                 ),
                 "deny": CommentLink(
-                    "{+api}/" + route + "/actions/deny?q=id:{id}",
+                    "{+api}" + route + "/{comment_id}/actions/deny",
                 ),
             },
         )

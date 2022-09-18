@@ -109,5 +109,5 @@ def test_service_basic_commenting_workflow(
     search_result = service.search(authenticated_identity)
 
     assert search_result.total != 0
-    assert next(search_result.hits).get('status') == CommentStatus.ALLOWED.value
-    assert next(search_result.hits).get('user_id') == authenticated_identity.id
+    assert next(search_result.hits).get("status") == CommentStatus.ALLOWED.value
+    assert next(search_result.hits).get("user_id") == authenticated_identity.id
