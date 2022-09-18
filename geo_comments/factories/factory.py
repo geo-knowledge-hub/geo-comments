@@ -210,7 +210,7 @@ class CommentTypeFactory:
         resource_cls_name = f"{self.comment_type_name}Resource"
 
         route = self.comment_service_endpoint_route or f"/{self.comment_name_lower}s"
-        route = "{pid_value}" + route
+        route = "/<pid_value>" + route
 
         config_cls_attributes = dict(
             blueprint_name=self.comment_name_lower,
@@ -219,10 +219,10 @@ class CommentTypeFactory:
             routes={
                 # General routes
                 "list": route,
-                "item": route + "/{comment_id}",
+                "item": route + "/<comment_id>",
                 # Admin routes
-                "deny-item": route + "/{comment_id}/actions/deny",
-                "allow-item": route + "/{comment_id}/actions/allow",
+                "deny-item": route + "/<comment_id>/actions/deny",
+                "allow-item": route + "/<comment_id>/actions/allow",
             },
             **self.comment_model_cls_attr,
         )

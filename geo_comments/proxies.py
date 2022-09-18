@@ -10,14 +10,5 @@
 from flask import current_app
 from werkzeug.local import LocalProxy
 
-
-def _ext_proxy(attr):
-    return LocalProxy(lambda: getattr(current_app.extensions["geo-comments"], attr))
-
-
-current_service = _ext_proxy("service")
-"""Proxy to the instantiated comment service."""
-
-
-current_resource = _ext_proxy("resource")
-"""Proxy to the instantiated comment resource."""
+current_comments = LocalProxy(lambda: current_app.extensions["geo-comments"])
+"""Proxy to the current GEO Comments extension."""

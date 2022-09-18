@@ -41,7 +41,7 @@ class CommentService(InvenioBaseService):
     #
     def _get_associated_record(self, record_id):
         """Get associated request."""
-        return self.record_associated_cls.get_record(record_id)
+        return self.record_associated_cls.pid.resolve(record_id)
 
     def _get_comment(self, comment_id, with_deleted=True):
         """Get associated event_id."""

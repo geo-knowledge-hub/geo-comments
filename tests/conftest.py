@@ -8,14 +8,23 @@
 """GEO Comments test configuration."""
 
 import pytest
-from flask_principal import Identity, Need, UserNeed
+from flask_principal import Identity, RoleNeed, UserNeed
 from flask_security import login_user
 from flask_security.utils import hash_password
+from geo_rdm_records.customizations.records.api import GEORecord
+from geo_rdm_records.modules.packages.records.api import GEOPackageRecord
+from geo_rdm_records.proxies import current_geo_packages_service
 from invenio_access.models import ActionRoles
-from invenio_access.permissions import superuser_access, system_identity
+from invenio_access.permissions import (
+    any_user,
+    authenticated_user,
+    superuser_access,
+    system_identity,
+)
 from invenio_accounts.models import Role
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api as _create_api
+from invenio_rdm_records.proxies import current_rdm_records_service
 from invenio_vocabularies.proxies import current_service as vocabulary_service
 from invenio_vocabularies.records.api import Vocabulary
 
@@ -78,7 +87,11 @@ def users(app):
         db.session.add(su_action_role)
 
         basic_user = datastore.create_user(
-            email="user1@example.org", password=hash_password("password"), active=True
+            email="basic@example.org", password=hash_password("password"), active=True
+        )
+
+        basic_user2 = datastore.create_user(
+            email="basic2@example.org", password=hash_password("password"), active=True
         )
 
         admin_user = datastore.create_user(
@@ -87,7 +100,49 @@ def users(app):
         admin_user.roles.append(su_role)
 
     db.session.commit()
-    return [basic_user, admin_user]
+    return [basic_user, basic_user2, admin_user]
+
+
+#
+# Identities
+#
+@pytest.fixture(scope="module")
+def authenticated_identity(users):
+    """Authenticated identity fixture."""
+    user_id = users[0].id
+
+    identity = Identity(user_id)
+    identity.provides.add(UserNeed(user_id))
+    identity.provides.add(authenticated_user)
+    return identity
+
+
+@pytest.fixture(scope="module")
+def superuser_identity(users):
+    """Authenticated identity fixture."""
+    user_id = users[-1].id
+
+    identity = Identity(user_id)
+    identity.provides.add(UserNeed(user_id))
+    identity.provides.add(RoleNeed("superuser-access"))
+    return identity
+
+
+@pytest.fixture(scope="module")
+def anyuser_identity():
+    """System identity."""
+    identity = Identity(4)
+    identity.provides.add(any_user)
+    return identity
+
+
+@pytest.fixture(scope="module")
+def another_authenticated_identity():
+    """System identity."""
+    identity = Identity(5)
+    identity.provides.add(UserNeed(5))
+    identity.provides.add(authenticated_user)
+    return identity
 
 
 #
@@ -216,3 +271,33 @@ def minimal_record():
             "title": "A Romans story",
         },
     }
+
+
+@pytest.fixture(scope="module")
+def record_resource_simple(
+    location, resource_type_v, authenticated_identity, minimal_record
+):
+    """Basic Resource Record."""
+    record_item = current_rdm_records_service.create(
+        authenticated_identity, minimal_record
+    )
+    record_item = current_rdm_records_service.publish(
+        authenticated_identity, record_item["id"]
+    )
+
+    return GEORecord.pid.resolve(record_item["id"])
+
+
+@pytest.fixture(scope="module")
+def record_package_simple(
+    location, resource_type_v, authenticated_identity, minimal_record
+):
+    """Basic Package Record."""
+    record_item = current_geo_packages_service.create(
+        authenticated_identity, minimal_record
+    )
+    record_item = current_geo_packages_service.publish(
+        authenticated_identity, record_item["id"]
+    )
+
+    return GEOPackageRecord.pid.resolve(record_item["id"])
