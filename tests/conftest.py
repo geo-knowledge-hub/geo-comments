@@ -11,17 +11,11 @@ import pytest
 from flask_principal import Identity, Need, UserNeed
 from flask_security import login_user
 from flask_security.utils import hash_password
-from geo_rdm_records.customizations.records.api import GEODraft, GEORecord
-from geo_rdm_records.modules.packages.records.api import (
-    GEOPackageDraft,
-    GEOPackageRecord,
-)
 from invenio_access.models import ActionRoles
 from invenio_access.permissions import superuser_access, system_identity
 from invenio_accounts.models import Role
 from invenio_accounts.testutils import login_user_via_session
 from invenio_app.factory import create_api as _create_api
-from invenio_db import db
 from invenio_vocabularies.proxies import current_service as vocabulary_service
 from invenio_vocabularies.records.api import Vocabulary
 
@@ -63,19 +57,6 @@ def create_app(instance_path):
 
 
 #
-# Identity
-#
-@pytest.fixture(scope="module")
-def identity_simple():
-    """Simple identity fixture."""
-    i = Identity(1)
-    i.provides.add(UserNeed(1))
-    i.provides.add(Need(method="system_role", value="any_user"))
-    i.provides.add(Need(method="system_role", value="authenticated_user"))
-    return i
-
-
-#
 # Users
 #
 @pytest.fixture(scope="module")
@@ -96,19 +77,17 @@ def users(app):
         su_action_role = ActionRoles.create(action=superuser_access, role=su_role)
         db.session.add(su_action_role)
 
-        user1 = datastore.create_user(
+        basic_user = datastore.create_user(
             email="user1@example.org", password=hash_password("password"), active=True
         )
-        user2 = datastore.create_user(
-            email="user2@example.org", password=hash_password("password"), active=True
-        )
-        admin = datastore.create_user(
+
+        admin_user = datastore.create_user(
             email="admin@example.org", password=hash_password("password"), active=True
         )
-        admin.roles.append(su_role)
+        admin_user.roles.append(su_role)
 
     db.session.commit()
-    return [user1, user2, admin]
+    return [basic_user, admin_user]
 
 
 #
@@ -237,37 +216,3 @@ def minimal_record():
             "title": "A Romans story",
         },
     }
-
-
-@pytest.fixture(scope="module")
-def record_resource_simple(minimal_record, location, resource_type_v):
-    """Basic Resource Record."""
-    draft = GEODraft.create(minimal_record)
-    draft.commit()
-    db.session.commit()
-
-    record = GEORecord.publish(draft)
-    record.commit()
-    db.session.commit()
-
-    GEODraft.index.refresh()
-    GEORecord.index.refresh()
-
-    return record
-
-
-@pytest.fixture(scope="module")
-def record_package_simple(minimal_record, location, resource_type_v):
-    """Basic Package Record."""
-    draft = GEOPackageDraft.create(minimal_record)
-    draft.commit()
-    db.session.commit()
-
-    record = GEOPackageRecord.publish(draft)
-    record.commit()
-    db.session.commit()
-
-    GEOPackageDraft.index.refresh()
-    GEOPackageRecord.index.refresh()
-
-    return record

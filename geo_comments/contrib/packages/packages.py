@@ -7,6 +7,7 @@
 
 """Contrib - comments and feedbacks for Packages API."""
 
+from geo_rdm_records.modules.packages.records.api import GEOPackageRecord
 from geo_rdm_records.modules.packages.records.models import GEOPackageRecordMetadata
 
 from geo_comments.factories import CommentTypeFactory, FeedbackTypeFactory
@@ -19,7 +20,8 @@ from .systemfield import RecordEntity
 package_comments = CommentTypeFactory(
     comment_type_name="PackageComment",
     comment_record_entity_cls=RecordEntity,
-    comment_associated_record_cls=GEOPackageRecordMetadata,
+    comment_associated_record_cls=GEOPackageRecord,
+    comment_associated_metadata_cls=GEOPackageRecordMetadata,
     comment_service_id="package_comments",
 )
 
@@ -29,6 +31,7 @@ package_comments = CommentTypeFactory(
 package_feedbacks = FeedbackTypeFactory(
     comment_type_name="PackageFeedback",
     comment_record_entity_cls=RecordEntity,
-    comment_associated_record_cls=GEOPackageRecordMetadata,
+    comment_associated_record_cls=GEOPackageRecord,
+    comment_associated_metadata_cls=GEOPackageRecordMetadata,
     comment_service_id="package_feedback",
 )

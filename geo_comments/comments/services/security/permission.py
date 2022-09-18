@@ -7,16 +7,11 @@
 
 """Comment permission policy."""
 
-from geo_config.security.generators import GeoSecretariat
-from invenio_rdm_records.services.generators import (
-    CommunityAction,
-    RecordOwners,
-    SecretLinks,
-)
+from invenio_rdm_records.services.generators import CommunityAction, SecretLinks
 from invenio_records_permissions.generators import AuthenticatedUser, SystemProcess
 from invenio_records_permissions.policies.records import RecordPermissionPolicy
 
-from geo_comments.comments.services.security.generators import CommentOwner, IfDenied
+from .generators import CommentOwner, GeoSecretariat, IfDenied, RecordOwners
 
 
 class CommentPermissionPolicy(RecordPermissionPolicy):
@@ -26,19 +21,13 @@ class CommentPermissionPolicy(RecordPermissionPolicy):
     # High-level permissions
     #
 
-    # Record related
-    can_view_associated_record = [
-        RecordOwners(),
-        SecretLinks("view"),
-        CommunityAction("view"),
-    ]
-
     # Comment related
     can_manage = [
         RecordOwners(),
         GeoSecretariat(),
-        CommunityAction("curate"),
         SystemProcess(),
+        # ToDo: Review
+        # CommunityAction("curate"),
     ]
 
     can_curate = can_manage + [CommentOwner()]
@@ -60,8 +49,27 @@ class CommentPermissionPolicy(RecordPermissionPolicy):
     # Allow submitting new record
     can_create = can_authenticated
 
-    # Allow editing published ratings
+    # Allow editing published comments
     can_update = can_curate
 
-    # Allow deleting
+    # Allow deleting published comments
     can_delete = can_curate
+
+    #
+    # Comments - Management
+    #
+
+    # Allowing changing the comment state
+    can_change_state = can_manage
+
+    #
+    # Comments - Related records
+    #
+
+    can_view_associated_record = [
+        RecordOwners(),
+        SystemProcess(),
+        # ToDo: Review
+        # SecretLinks("view"),
+        # CommunityAction("view"),
+    ]

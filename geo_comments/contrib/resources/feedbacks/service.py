@@ -7,14 +7,14 @@
 
 """Service for the Packages API contrib."""
 
-from ..resources import resource_comments
+from ..resources import resource_feedbacks
 
 #
 # Service
 #
-ResourceFeedbackService = resource_comments.comment_service_cls
+ResourceFeedbackService = resource_feedbacks.comment_service_cls
 
 #
 # Configuration
 #
-ResourceFeedbackServiceConfig = resource_comments.comment_service_cls_config
+ResourceFeedbackServiceConfig = resource_feedbacks.comment_service_cls_config

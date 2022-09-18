@@ -18,6 +18,47 @@ from invenio_access.permissions import authenticated_user
 from invenio_records_permissions.generators import Generator
 
 
+class GeoSecretariat(GeoSecretariatBaseGenerator):
+    """GEO Secretariat generator."""
+
+    def query_filter(self, identity=None, **kwargs):
+        """Filters for current identity as super user."""
+        return Q("match", **{"status": "D"}) | Q("match", **{"status": "A"})
+
+
+class CommentOwner(Generator):
+    """Comment Owner generator."""
+
+    def needs(self, comment=None, **kwargs):
+        """Enabling Needs."""
+        if not comment:
+            return [authenticated_user]
+        return [UserNeed(comment["user_id"])]
+
+    def query_filter(self, identity=None, **kwargs):
+        """Filters for current identity as super user."""
+        return Q("term", **{"user_id": identity.id})
+
+
+class RecordOwners(Generator):
+    """Allows record owners."""
+
+    def needs(self, record=None, comment=None, **kwargs):
+        """Enabling Needs."""
+        if record:
+            return [UserNeed(owner.owner_id) for owner in record.parent.access.owners]
+
+        else:
+
+            if not comment:
+                return [authenticated_user]
+
+            return [
+                UserNeed(owner.owner_id)
+                for owner in comment.record.parent.access.owners
+            ]
+
+
 class IfDenied(IfIsEqual):
     """Conditional Generator specialized to define permissions for denied feedbacks."""
 
@@ -29,6 +70,10 @@ class IfDenied(IfIsEqual):
             then_=then_,
             else_=else_,
         )
+
+    def generators(self, comment=None, **kwargs):
+        """Choose between 'then' or 'else' generators."""
+        return super().generators(record=comment)
 
     def make_query(self, generators, **kwargs):
         """Make a query for one set of generators.
@@ -49,25 +94,3 @@ class IfDenied(IfIsEqual):
         else_query = self.make_query(self.else_, **kwargs)
 
         return (q_denied & then_query) | (q_allowed & else_query)
-
-
-class GeoSecretariat(GeoSecretariatBaseGenerator):
-    """GEO Secretariat generator."""
-
-    def query_filter(self, identity=None, **kwargs):
-        """Filters for current identity as super user."""
-        return Q("match", **{"status": "D"}) | Q("match", **{"status": "A"})
-
-
-class CommentOwner(Generator):
-    """Comment Owner generator."""
-
-    def needs(self, record=None, **kwargs):
-        """Enabling Needs."""
-        if not record:
-            return [authenticated_user]
-        return [UserNeed(record.get("user_id"))]
-
-    def query_filter(self, identity=None, **kwargs):
-        """Filters for current identity as super user."""
-        return Q("term", **{"user_id": identity.id})

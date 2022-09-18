@@ -50,10 +50,11 @@ class CommentService(InvenioBaseService):
     @unit_of_work()
     def _change_comment_status(self, identity, comment_id, status, uow=None):
         """Comment status handler."""
-        self.require_permission(identity, "change_state")
-
         # searching
         comment = self.record_cls.get_record(id_=comment_id, with_denied=True)
+
+        self.require_permission(identity, "view_associated_record", comment=comment)
+        self.require_permission(identity, "change_state", comment=comment)
 
         # running the components
         self.run_components(
@@ -80,6 +81,7 @@ class CommentService(InvenioBaseService):
         uow=None,
     ):
         """Create a comment record."""
+        # Permissions
         self.require_permission(
             identity, "view_associated_record", record=associated_record
         )
@@ -136,9 +138,7 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id, with_denied=True)
 
         # Permissions
-        self.require_permission(
-            identity, "view_associated_record", record=comment.record
-        )
+        self.require_permission(identity, "view_associated_record", comment=comment)
         self.require_permission(identity, "read", comment=comment)
 
         return self.result_item(
@@ -154,9 +154,7 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id)
 
         # Permissions
-        self.require_permission(
-            identity, "view_associated_record", record=comment.record
-        )
+        self.require_permission(identity, "view_associated_record", comment=comment)
         self.require_permission(identity, "update", comment=comment)
 
         data, _ = self.schema.load(
@@ -188,9 +186,7 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id)
 
         # Permissions
-        self.require_permission(
-            identity, "view_associated_record", record=comment.record
-        )
+        self.require_permission(identity, "view_associated_record", comment=comment)
         self.require_permission(identity, "delete", comment=comment)
 
         # Run components
