@@ -18,4 +18,4 @@ status = TermsFacet(field="status", label=_("Status"))
 #
 # Record Facet
 #
-record = TermsFacet(field="record", label=_("Record"))
+record = TermsFacet(field="record_pid", label=_("Record"))

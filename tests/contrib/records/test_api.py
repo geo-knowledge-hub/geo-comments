@@ -5,7 +5,7 @@
 # geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-"""Contrib - General API tests."""
+"""Test contrib records."""
 
 import pytest
 from invenio_db import db
@@ -45,7 +45,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
     ],
 )
 def test_api_basic_commenting_workflow(users, record, comment_content, comment_cls):
-    """Test basic commenting workflow."""
+    """Test basic commenting workflow (Using API)."""
     # 1. Creating a comment
     comment = comment_cls.create(comment_content)
 

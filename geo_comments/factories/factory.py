@@ -56,6 +56,7 @@ class CommentTypeFactory:
         comment_type_name,
         comment_record_entity_cls,
         comment_associated_record_cls,
+        comment_associated_metadata_cls,
         schema_path="local://comments/comment-v1.0.0.json",
         schema_version="1.0.0",
         comment_model_cls_attr=None,
@@ -80,7 +81,9 @@ class CommentTypeFactory:
         self.comment_model_cls_attr = comment_model_cls_attr or {}
         self.comment_record_cls_attr = comment_record_cls_attr or {}
         self.comment_record_entity_cls = comment_record_entity_cls
+
         self.comment_associated_record_cls = comment_associated_record_cls
+        self.comment_associated_metadata_cls = comment_associated_metadata_cls
 
         # record class attributes
         self.schema_version = schema_version
@@ -99,9 +102,12 @@ class CommentTypeFactory:
         self.comment_service_id = comment_service_id
         self.comment_service_name = comment_service_name
         self.comment_service_permission_policy = comment_service_permission_policy
-        self.comment_service_search_options = comment_service_search_options
         self.comment_service_schema = comment_service_schema
         self.comment_service_components = comment_service_components
+
+        self.comment_service_search_options = (
+            comment_service_search_options or CommentServiceConfig.search
+        )
 
         # operating!
         self.create_comment_type()
@@ -148,10 +154,10 @@ class CommentTypeFactory:
 
         # Record
         model_class_attributes["record"] = db.relationship(
-            self.comment_associated_record_cls
+            self.comment_associated_metadata_cls
         )
         model_class_attributes["record_id"] = db.Column(
-            UUIDType, db.ForeignKey(self.comment_associated_record_cls.id)
+            UUIDType, db.ForeignKey(self.comment_associated_metadata_cls.id)
         )
 
         # Comment
@@ -204,6 +210,7 @@ class CommentTypeFactory:
         resource_cls_name = f"{self.comment_type_name}Resource"
 
         route = self.comment_service_endpoint_route or f"/{self.comment_name_lower}s"
+        route = "/<pid_value>" + route
 
         config_cls_attributes = dict(
             blueprint_name=self.comment_name_lower,
@@ -211,11 +218,11 @@ class CommentTypeFactory:
             or f"/{self.comment_name_lower}s",
             routes={
                 # General routes
-                "list": "/<pid_value>/" + route,
-                "item": "/<pid_value>/" + route + "/<comment_id>",
+                "list": route,
+                "item": route + "/<comment_id>",
                 # Admin routes
-                "deny-item": "/<pid_value>/" + route + "/<comment_id>/actions/deny",
-                "allow-item": "/<pid_value>/" + route + "/<comment_id>/actions/allow",
+                "deny-item": route + "/<comment_id>/actions/deny",
+                "allow-item": route + "/<comment_id>/actions/allow",
             },
             **self.comment_model_cls_attr,
         )
@@ -239,21 +246,27 @@ class CommentTypeFactory:
                 permission_policy_cls_name, (CommentPermissionPolicy,), {}
             )
 
+        route_prefix = self.comment_service_endpoint_route_prefix or ""
+        route_prefix = f"{route_prefix}/" if route_prefix else ""
+
         route = self.comment_service_endpoint_route or f"/{self.comment_name_lower}s"
+        route = "{pid_value}" + route
+        route = route_prefix + route
 
         config_cls_attributes = dict(
             permission_policy_cls=self.comment_service_permission_policy,
             record_cls=self.comment_cls,
+            record_associated_cls=self.comment_associated_record_cls,
             search=self.comment_service_search_options,
             schema=self.comment_service_schema,
-            links_item={"self": CommentLink("{+api}/" + route + "?q=id:{id}")},
-            links_search=pagination_links("{+api}/" + route + "{?args*}"),
+            links_item={"self": CommentLink("{+api}" + route + "/{comment_id}")},
+            links_search=pagination_links("{+api}" + route + "{?args*}"),
             links_action={
                 "allow": CommentLink(
-                    "{+api}/" + route + "/actions/allow?q=id:{id}",
+                    "{+api}" + route + "/{comment_id}/actions/allow",
                 ),
                 "deny": CommentLink(
-                    "{+api}/" + route + "/actions/deny?q=id:{id}",
+                    "{+api}" + route + "/{comment_id}/actions/deny",
                 ),
             },
         )
@@ -289,6 +302,7 @@ class FeedbackTypeFactory(CommentTypeFactory):
         comment_type_name,
         comment_record_entity_cls,
         comment_associated_record_cls,
+        comment_associated_metadata_cls,
         **kwargs,
     ):
         """Initializer."""
@@ -312,6 +326,7 @@ class FeedbackTypeFactory(CommentTypeFactory):
             comment_type_name,
             comment_record_entity_cls,
             comment_associated_record_cls,
+            comment_associated_metadata_cls,
             index_name=index_name,
             schema_path=schema_path,
             comment_record_cls_attr=comment_record_cls_attr,

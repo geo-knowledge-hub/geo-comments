@@ -8,6 +8,7 @@
 """Factory tests."""
 
 import pytest
+from geo_rdm_records.modules.packages import GEOPackageRecord
 from geo_rdm_records.modules.packages.records.models import GEOPackageRecordMetadata
 from invenio_rdm_records.records.models import RDMRecordMetadata as GEORecordMetadata
 
@@ -33,7 +34,8 @@ def test_model_class_create(type_factory, type_name, record_entity):
     package_feedbacks = type_factory(
         comment_type_name=type_name,
         comment_record_entity_cls=record_entity,
-        comment_associated_record_cls=GEOPackageRecordMetadata,
+        comment_associated_record_cls=GEOPackageRecord,
+        comment_associated_metadata_cls=GEOPackageRecordMetadata,
     )
 
     assert package_feedbacks.model_cls.__name__ == type_expected
@@ -47,7 +49,8 @@ def test_model_class_create(type_factory, type_name, record_entity):
     resource_feedbacks = type_factory(
         comment_type_name=type_name,
         comment_record_entity_cls=record_entity,
-        comment_associated_record_cls=GEORecordMetadata,
+        comment_associated_record_cls=GEOPackageRecord,
+        comment_associated_metadata_cls=GEOPackageRecordMetadata,
     )
 
     assert resource_feedbacks.model_cls.__name__ == type_expected

@@ -31,7 +31,7 @@ class CommentResourceConfig(ResourceConfig):
     request_search_args = SearchRequestArgsSchema
     request_headers = {"if_match": ma.fields.Int()}
     request_comment_view_args = {
-        "comment_id": ma.fields.UUID(required=True),
+        "comment_id": ma.fields.UUID(),
         "pid_value": ma.fields.Str(),
     }
 

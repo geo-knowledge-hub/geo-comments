@@ -7,6 +7,7 @@
 
 """Contrib - comments and feedbacks for Packages API."""
 
+from geo_rdm_records.customizations.records.api import GEORecord
 from invenio_rdm_records.records.models import RDMRecordMetadata as GEORecordMetadata
 
 from geo_comments.factories import CommentTypeFactory, FeedbackTypeFactory
@@ -19,8 +20,12 @@ from .systemfield import RecordEntity
 resource_comments = CommentTypeFactory(
     comment_type_name="ResourceComment",
     comment_record_entity_cls=RecordEntity,
-    comment_associated_record_cls=GEORecordMetadata,
+    comment_associated_record_cls=GEORecord,
+    comment_associated_metadata_cls=GEORecordMetadata,
     comment_service_id="resource_comment",
+    comment_service_name="ResourceComment",
+    comment_service_endpoint_route="/comments",
+    comment_service_endpoint_route_prefix="/records",
 )
 
 #
@@ -29,6 +34,10 @@ resource_comments = CommentTypeFactory(
 resource_feedbacks = FeedbackTypeFactory(
     comment_type_name="ResourceFeedback",
     comment_record_entity_cls=RecordEntity,
-    comment_associated_record_cls=GEORecordMetadata,
+    comment_associated_record_cls=GEORecord,
+    comment_associated_metadata_cls=GEORecordMetadata,
     comment_service_id="resource_feedback",
+    comment_service_name="ResourceFeedback",
+    comment_service_endpoint_route="/feedbacks",
+    comment_service_endpoint_route_prefix="/records",
 )

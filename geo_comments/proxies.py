@@ -10,5 +10,5 @@
 from flask import current_app
 from werkzeug.local import LocalProxy
 
-current_comment = LocalProxy(lambda: current_app.extensions["geo-comments"])
-"""Proxy to the extension."""
+current_comments = LocalProxy(lambda: current_app.extensions["geo-comments"])
+"""Proxy to the current GEO Comments extension."""

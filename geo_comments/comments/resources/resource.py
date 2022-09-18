@@ -89,6 +89,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
         return item.to_dict(), 200
 
     @request_data
+    @request_comment_view_args
     @response_handler()
     def create(self):
         """Create an item."""

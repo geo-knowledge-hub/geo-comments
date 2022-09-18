@@ -60,7 +60,7 @@ class CommentData(CommentComponentBase):
 
         # user and record
         comment.record = associated_record.id
-        comment.user = identity.user.id
+        comment.user = identity.id
 
         # checking auto approve
         if auto_approve:
