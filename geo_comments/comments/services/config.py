@@ -21,7 +21,7 @@ from geo_comments.comments.services.security.permission import CommentPermission
 class CommentSearchOptions(SearchOptions):
     """Search Options."""
 
-    facets = {"status": facets.status, "record": facets.record}
+    facets = {"status": facets.status}
 
 
 class CommentServiceConfig(RecordServiceConfig):

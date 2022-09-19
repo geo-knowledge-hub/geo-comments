@@ -7,6 +7,8 @@
 
 """Comment service."""
 
+from elasticsearch_dsl import Q
+from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.records import (
     RecordService as InvenioBaseService,
 )
@@ -202,6 +204,44 @@ class CommentService(InvenioBaseService):
         )
 
         return True
+
+    def search(
+        self, identity, associated_record_id, params=None, es_preference=None, **kwargs
+    ):
+        """Search for records matching the querystring."""
+        params = params or {}
+        expand = kwargs.pop("expand", False)
+
+        # Permissions
+        associated_record = self._get_associated_record(associated_record_id)
+        self.require_permission(
+            identity, "view_associated_record", record=associated_record
+        )
+
+        # Prepare and execute the search
+        search = self._search(
+            "search",
+            identity,
+            params,
+            es_preference,
+            extra_filter=Q("term", record_pid=str(associated_record_id)),
+            **kwargs
+        )
+        search_result = search.execute()
+
+        return self.result_list(
+            self,
+            identity,
+            search_result,
+            params,
+            links_tpl=LinksTemplate(
+                self.config.links_search,
+                context={"args": params, "pid_value": associated_record_id},
+            ),
+            links_item_tpl=self.links_item_tpl,
+            expandable_fields=self.expandable_fields,
+            expand=expand,
+        )
 
     @unit_of_work()
     def allow_comment(self, identity, comment_id, uow=None):

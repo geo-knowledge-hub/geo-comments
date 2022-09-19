@@ -67,11 +67,13 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
         ]
 
     @request_search_args
+    @request_comment_view_args
     @response_handler(many=True)
     def search(self):
         """Perform a search over the items."""
         hits = self.service.search(
             identity=g.identity,
+            associated_record_id=resource_requestctx.view_args["pid_value"],
             params=resource_requestctx.args,
             es_preference=es_preference(),
         )

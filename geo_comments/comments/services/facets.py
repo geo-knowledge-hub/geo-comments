@@ -14,8 +14,3 @@ from invenio_records_resources.services.records.facets import TermsFacet
 # Status Facet
 #
 status = TermsFacet(field="status", label=_("Status"))
-
-#
-# Record Facet
-#
-record = TermsFacet(field="record_pid", label=_("Record"))

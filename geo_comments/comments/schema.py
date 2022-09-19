@@ -7,6 +7,7 @@
 
 """Comment schemas."""
 
+from invenio_records_resources.services.records.schema import BaseRecordSchema
 from marshmallow import Schema, fields, validate
 from marshmallow_utils.fields import SanitizedHTML, SanitizedUnicode
 
@@ -14,7 +15,7 @@ from marshmallow_utils.fields import SanitizedHTML, SanitizedUnicode
 #
 # Base comment schema
 #
-class CommentSchema(Schema):
+class CommentSchema(BaseRecordSchema):
     """Comment schema class."""
 
     id = fields.UUID(dump_only=True)

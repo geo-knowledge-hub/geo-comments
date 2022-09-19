@@ -63,7 +63,9 @@ def test_service_basic_commenting_workflow(
     service = service_registry.get(service_name)
 
     # 2. Creating a comment
-    comment = service.create(authenticated_identity, record.pid.pid_value, comment_content)
+    comment = service.create(
+        authenticated_identity, record.pid.pid_value, comment_content
+    )
 
     # 2.1. Checking comment created properties
     assert comment["record_pid"] == record.pid.pid_value
@@ -106,7 +108,7 @@ def test_service_basic_commenting_workflow(
     # service.read(anyuser_identity, comment_id)
 
     # 5. Searching for the comment by record
-    search_result = service.search(authenticated_identity)
+    search_result = service.search(authenticated_identity, record.pid.pid_value)
 
     assert search_result.total != 0
     assert next(search_result.hits).get("status") == CommentStatus.ALLOWED.value
