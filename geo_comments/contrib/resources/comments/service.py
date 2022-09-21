@@ -8,13 +8,18 @@
 """Service for the Packages API contrib."""
 
 from ..resources import resource_comments
+from .schema import CommentSchema
 
 #
 # Service
 #
 ResourceCommentService = resource_comments.comment_service_cls
 
+
 #
 # Configuration
 #
-ResourceCommentServiceConfig = resource_comments.comment_service_cls_config
+class ResourceCommentServiceConfig(resource_comments.comment_service_cls_config):
+    """Service configuration class."""
+
+    schema = CommentSchema
