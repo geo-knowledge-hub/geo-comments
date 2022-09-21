@@ -35,6 +35,8 @@ class CommentResourceConfig(ResourceConfig):
         "pid_value": ma.fields.Str(),
     }
 
+    request_extra_args = {"expand": ma.fields.Boolean()}
+
     request_body_parsers = {"application/json": RequestBodyParser(JSONDeserializer())}
 
     response_handlers = {

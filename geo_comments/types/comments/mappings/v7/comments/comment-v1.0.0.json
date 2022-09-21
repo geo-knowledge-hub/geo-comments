@@ -12,10 +12,10 @@
       "content": {
         "type": "text"
       },
-      "record_pid": {
+      "record": {
         "type": "keyword"
       },
-      "user_id": {
+      "user": {
         "type": "keyword"
       },
       "created": {

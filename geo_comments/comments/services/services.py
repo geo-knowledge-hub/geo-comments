@@ -19,7 +19,9 @@ from invenio_records_resources.services.uow import (
 )
 
 from geo_comments.comments.records.api import CommentStatus
-from geo_comments.comments.services.links import ActionLinksTemplate
+
+from .links import ActionLinksTemplate
+from .results import EntityResolverExpandableField
 
 
 class CommentService(InvenioBaseService):
@@ -38,6 +40,11 @@ class CommentService(InvenioBaseService):
         """Class of a record associated to a comment."""
         return self.config.record_associated_cls
 
+    @property
+    def expandable_fields(self):
+        """Get expandable fields."""
+        return [EntityResolverExpandableField("user")]
+
     #
     # Internal methods
     #
@@ -50,7 +57,9 @@ class CommentService(InvenioBaseService):
         return self.record_cls.get_record(comment_id, with_deleted=with_deleted)
 
     @unit_of_work()
-    def _change_comment_status(self, identity, comment_id, status, uow=None):
+    def _change_comment_status(
+        self, identity, comment_id, status, expand=False, uow=None
+    ):
         """Comment status handler."""
         # searching
         comment = self.record_cls.get_record(id_=comment_id, with_denied=True)
@@ -69,7 +78,14 @@ class CommentService(InvenioBaseService):
 
         uow.register(RecordCommitOp(comment, self.indexer))
 
-        return self.result_item(self, identity, comment, links_tpl=self.links_item_tpl)
+        return self.result_item(
+            self,
+            identity,
+            comment,
+            links_tpl=self.links_item_tpl,
+            expandable_fields=self.expandable_fields,
+            expand=expand,
+        )
 
     @unit_of_work()
     def _create(
@@ -80,6 +96,7 @@ class CommentService(InvenioBaseService):
         data,
         auto_approve=False,
         raise_errors=True,
+        expand=False,
         uow=None,
     ):
         """Create a comment record."""
@@ -112,7 +129,13 @@ class CommentService(InvenioBaseService):
         uow.register(RecordCommitOp(comment, self.indexer))
 
         return self.result_item(
-            self, identity, comment, links_tpl=self.links_item_tpl, errors=errors
+            self,
+            identity,
+            comment,
+            links_tpl=self.links_item_tpl,
+            errors=errors,
+            expandable_fields=self.expandable_fields,
+            expand=expand,
         )
 
     #
@@ -120,7 +143,13 @@ class CommentService(InvenioBaseService):
     #
     @unit_of_work()
     def create(
-        self, identity, associated_record_id, data, auto_approve=False, uow=None
+        self,
+        identity,
+        associated_record_id,
+        data,
+        auto_approve=False,
+        expand=False,
+        uow=None,
     ):
         """Create a comment record."""
         associated_record = self._get_associated_record(associated_record_id)
@@ -132,6 +161,7 @@ class CommentService(InvenioBaseService):
             data,
             auto_approve=auto_approve,
             uow=uow,
+            expand=expand,
         )
 
     def read(self, identity, comment_id, expand=False):
@@ -148,10 +178,11 @@ class CommentService(InvenioBaseService):
             identity,
             comment,
             links_tpl=self.links_item_tpl,
+            expand=expand,
         )
 
     @unit_of_work()
-    def update(self, comment_id, identity, data, uow=None):
+    def update(self, comment_id, identity, data, expand=False, uow=None):
         """Replace a record."""
         comment = self.record_cls.get_record(id_=comment_id)
 
@@ -180,6 +211,8 @@ class CommentService(InvenioBaseService):
             identity,
             comment,
             links_tpl=self.links_item_tpl,
+            expandable_fields=self.expandable_fields,
+            expand=expand,
         )
 
     @unit_of_work()
@@ -224,7 +257,7 @@ class CommentService(InvenioBaseService):
             identity,
             params,
             es_preference,
-            extra_filter=Q("term", record_pid=str(associated_record_id)),
+            extra_filter=Q("term", record=str(associated_record_id)),
             **kwargs
         )
         search_result = search.execute()
@@ -244,15 +277,15 @@ class CommentService(InvenioBaseService):
         )
 
     @unit_of_work()
-    def allow_comment(self, identity, comment_id, uow=None):
+    def allow_comment(self, identity, comment_id, expand=False, uow=None):
         """Allow comment."""
         return self._change_comment_status(
-            identity, comment_id, CommentStatus.ALLOWED, uow=uow
+            identity, comment_id, CommentStatus.ALLOWED, expand=expand, uow=uow
         )
 
     @unit_of_work()
-    def deny_comment(self, identity, comment_id, uow=None):
+    def deny_comment(self, identity, comment_id, expand=False, uow=None):
         """Deny comment."""
         return self._change_comment_status(
-            identity, comment_id, CommentStatus.DENIED, uow=uow
+            identity, comment_id, CommentStatus.DENIED, expand=expand, uow=uow
         )
