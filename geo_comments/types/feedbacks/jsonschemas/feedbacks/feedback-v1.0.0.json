@@ -22,10 +22,10 @@
     "topics": {
       "$ref": "local://feedbacks/definitions-v1.0.0.json#/topics"
     },
-    "user_id": {
+    "user": {
       "$ref": "local://comments/definitions-v1.0.0.json#/user"
     },
-    "record_pid": {
+    "record": {
       "type": "string"
     }
   }

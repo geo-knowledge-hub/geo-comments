@@ -19,7 +19,9 @@ from invenio_records_resources.services.uow import (
 )
 
 from geo_comments.comments.records.api import CommentStatus
-from geo_comments.comments.services.links import ActionLinksTemplate
+
+from .links import ActionLinksTemplate
+from .results import EntityResolverExpandableField
 
 
 class CommentService(InvenioBaseService):
@@ -37,6 +39,11 @@ class CommentService(InvenioBaseService):
     def record_associated_cls(self):
         """Class of a record associated to a comment."""
         return self.config.record_associated_cls
+
+    @property
+    def expandable_fields(self):
+        """Get expandable fields."""
+        return [EntityResolverExpandableField("user")]
 
     #
     # Internal methods
@@ -224,7 +231,7 @@ class CommentService(InvenioBaseService):
             identity,
             params,
             es_preference,
-            extra_filter=Q("term", record_pid=str(associated_record_id)),
+            extra_filter=Q("term", record=str(associated_record_id)),
             **kwargs
         )
         search_result = search.execute()

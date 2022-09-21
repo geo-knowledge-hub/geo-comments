@@ -28,8 +28,8 @@ class CommentSchema(BaseRecordSchema):
         required=True,
     )
 
-    user_id = fields.Integer(required=True, dump_only=True, attribute="user_id")
-    record_pid = SanitizedUnicode(required=True, dump_only=True, attribute="record_pid")
+    user = fields.Integer(required=True, dump_only=True, attribute="user")
+    record = SanitizedUnicode(required=True, dump_only=True, attribute="record")
 
 
 #
