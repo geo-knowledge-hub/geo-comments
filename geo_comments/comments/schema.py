@@ -28,7 +28,7 @@ class CommentSchema(BaseRecordSchema):
         required=True,
     )
 
-    user = fields.Integer(required=True, dump_only=True, attribute="user")
+    user = fields.String(required=True, dump_only=True, attribute="user")
     record = SanitizedUnicode(required=True, dump_only=True, attribute="record")
 
 

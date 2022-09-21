@@ -17,6 +17,7 @@ from flask_resources import (
     route,
 )
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
+from invenio_records_resources.resources.records.resource import request_extra_args
 from invenio_records_resources.resources.records.utils import es_preference
 from sqlalchemy.exc import IntegrityError
 
@@ -68,6 +69,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
 
     @request_search_args
     @request_comment_view_args
+    @request_extra_args
     @response_handler(many=True)
     def search(self):
         """Perform a search over the items."""
@@ -76,22 +78,26 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
             associated_record_id=resource_requestctx.view_args["pid_value"],
             params=resource_requestctx.args,
             es_preference=es_preference(),
+            expand=resource_requestctx.args.get("expand", False),
         )
         return hits.to_dict(), 200
 
     @request_comment_view_args
+    @request_extra_args
     @response_handler(many=False)
     def read(self):
         """Read an item."""
         item = self.service.read(
             g.identity,
             comment_id=resource_requestctx.view_args["comment_id"],
+            expand=resource_requestctx.args.get("expand", False),
         )
 
         return item.to_dict(), 200
 
     @request_data
     @request_comment_view_args
+    @request_extra_args
     @response_handler()
     def create(self):
         """Create an item."""
@@ -100,12 +106,14 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
             resource_requestctx.view_args["pid_value"],
             resource_requestctx.data or {},
             auto_approve=current_app.config.get("GEO_COMMENT_AUTO_APPROVE", False),
+            expand=resource_requestctx.args.get("expand", False),
         )
         return item.to_dict(), 201
 
     @request_headers
     @request_comment_view_args
     @request_data
+    @request_extra_args
     @response_handler()
     def update(self):
         """Update an item."""
@@ -113,6 +121,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
             identity=g.identity,
             comment_id=resource_requestctx.view_args["comment_id"],
             data=resource_requestctx.data,
+            expand=resource_requestctx.args.get("expand", False),
         )
         return item.to_dict(), 200
 
@@ -128,6 +137,8 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
     @request_headers
     @request_read_args
     @request_comment_view_args
+    @request_extra_args
+    @response_handler()
     def deny_comment(self):
         """Deny comment."""
         denied_comment = self.service.deny_comment(
@@ -140,6 +151,8 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
     @request_headers
     @request_read_args
     @request_comment_view_args
+    @request_extra_args
+    @response_handler()
     def allow_comment(self):
         """Allow comment."""
         allowed_comment = self.service.allow_comment(

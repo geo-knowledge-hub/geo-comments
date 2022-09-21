@@ -69,7 +69,7 @@ def test_service_basic_commenting_workflow(
 
     # 2.1. Checking comment created properties
     assert comment["record"] == record.pid.pid_value
-    assert comment["user"] == authenticated_identity.id
+    assert comment["user"] == str(authenticated_identity.id)
     assert comment["content"] == comment_content["content"]
     assert comment["status"] == CommentStatus.DENIED.value
 
@@ -112,4 +112,4 @@ def test_service_basic_commenting_workflow(
 
     assert search_result.total != 0
     assert next(search_result.hits).get("status") == CommentStatus.ALLOWED.value
-    assert next(search_result.hits).get("user") == authenticated_identity.id
+    assert next(search_result.hits).get("user") == str(authenticated_identity.id)

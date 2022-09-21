@@ -102,4 +102,4 @@ class UserEntity(EntityBase):
 
     def dump(self):
         """Dump the user entity as a dict."""
-        return {"user": self._entity.id}
+        return {"user": str(self._entity.id)}
