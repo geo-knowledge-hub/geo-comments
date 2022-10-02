@@ -54,13 +54,13 @@ class BaseRecordEntity(EntityBase):
     def from_object(cls, instance):
         """Create a Record entity from an object."""
         if type(instance) == dict:
-            record_identifier = dict_lookup(instance, "record_pid")
+            record_identifier = dict_lookup(instance, "record")
             obj = cls.entity_cls.pid.resolve(record_identifier)
 
         else:
             # note: assuming the instance model class
             # (in this case `FeedbackRecord`).
-            record_identifier = getattr(instance.model, "record_id")
+            record_identifier = getattr(instance.model, "record")
             obj = cls.entity_cls.get_record(record_identifier)
 
         return (
@@ -73,7 +73,7 @@ class BaseRecordEntity(EntityBase):
 
     def dump(self):
         """Dump the user entity as a dict."""
-        return {"record_pid": self._entity.pid.pid_value}
+        return {"record": self._entity.pid.pid_value}
 
 
 class UserEntity(EntityBase):
@@ -85,21 +85,21 @@ class UserEntity(EntityBase):
     def from_object(cls, instance):
         """Create a user entity from an object."""
         if type(instance) == dict:
-            user_id = dict_lookup(instance, "user_id")
+            user = dict_lookup(instance, "user")
 
         else:
             # note: assuming the instance model class
             # (in this case `FeedbackRecord`).
-            user_id = getattr(instance.model, "user_id")
+            user = getattr(instance.model, "user")
 
         return (
             cls(
-                entity=InvenioUser.query.get(user_id),
+                entity=InvenioUser.query.get(user),
             )
-            if user_id
+            if user
             else None
         )
 
     def dump(self):
         """Dump the user entity as a dict."""
-        return {"user_id": self._entity.id}
+        return {"user": str(self._entity.id)}

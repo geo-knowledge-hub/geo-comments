@@ -147,16 +147,16 @@ class CommentTypeFactory:
         )
 
         # Users
-        model_class_attributes["user"] = db.relationship(InvenioUser)
-        model_class_attributes["user_id"] = db.Column(
+        model_class_attributes["user_obj"] = db.relationship(InvenioUser)
+        model_class_attributes["user"] = db.Column(
             db.Integer, db.ForeignKey(InvenioUser.id)
         )
 
         # Record
-        model_class_attributes["record"] = db.relationship(
+        model_class_attributes["record_obj"] = db.relationship(
             self.comment_associated_metadata_cls
         )
-        model_class_attributes["record_id"] = db.Column(
+        model_class_attributes["record"] = db.Column(
             UUIDType, db.ForeignKey(self.comment_associated_metadata_cls.id)
         )
 
@@ -190,12 +190,12 @@ class CommentTypeFactory:
 
         # User
         record_class_attributes["user"] = EntityField(
-            key="user_id", entity_obj_class=UserEntity
+            key="user", entity_obj_class=UserEntity
         )
 
         # Record
         record_class_attributes["record"] = EntityField(
-            key="record_id", entity_obj_class=self.comment_record_entity_cls
+            key="record", entity_obj_class=self.comment_record_entity_cls
         )
 
         self.comment_cls = type(
@@ -319,7 +319,7 @@ class FeedbackTypeFactory(CommentTypeFactory):
 
         # Users can send only one feedback
         comment_model_cls_attr = dict(
-            __table_args__=(db.UniqueConstraint("user_id", "record_id"),),
+            __table_args__=(db.UniqueConstraint("user", "record"),),
         )
 
         super().__init__(

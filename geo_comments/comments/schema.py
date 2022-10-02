@@ -7,6 +7,7 @@
 
 """Comment schemas."""
 
+from invenio_records_resources.services.records.schema import BaseRecordSchema
 from marshmallow import Schema, fields, validate
 from marshmallow_utils.fields import SanitizedHTML, SanitizedUnicode
 
@@ -14,7 +15,7 @@ from marshmallow_utils.fields import SanitizedHTML, SanitizedUnicode
 #
 # Base comment schema
 #
-class CommentSchema(Schema):
+class CommentSchema(BaseRecordSchema):
     """Comment schema class."""
 
     id = fields.UUID(dump_only=True)
@@ -27,8 +28,8 @@ class CommentSchema(Schema):
         required=True,
     )
 
-    user_id = fields.Integer(required=True, dump_only=True, attribute="user_id")
-    record_pid = SanitizedUnicode(required=True, dump_only=True, attribute="record_pid")
+    user = fields.String(required=True, dump_only=True, attribute="user")
+    record = SanitizedUnicode(required=True, dump_only=True, attribute="record")
 
 
 #
@@ -48,4 +49,15 @@ class FeedbackCommentSchema(CommentSchema):
 
     topics = fields.List(
         cls_or_instance=fields.Nested(FeedbackTopicSchema()), required=True
+    )
+
+
+#
+# Auxiliary functions
+#
+def generate_permission_schema_document(identity, service, obj):
+    """Generate document used to create permission schemas."""
+    return dict(
+        can_update=service.check_permission(identity, "update", event=obj),
+        can_delete=service.check_permission(identity, "delete", event=obj),
     )

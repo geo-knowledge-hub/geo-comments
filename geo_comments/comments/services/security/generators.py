@@ -33,11 +33,11 @@ class CommentOwner(Generator):
         """Enabling Needs."""
         if not comment:
             return [authenticated_user]
-        return [UserNeed(comment["user_id"])]
+        return [UserNeed(comment["user"])]
 
     def query_filter(self, identity=None, **kwargs):
         """Filters for current identity as super user."""
-        return Q("term", **{"user_id": identity.id})
+        return Q("term", **{"user": identity.id})
 
 
 class RecordOwners(Generator):

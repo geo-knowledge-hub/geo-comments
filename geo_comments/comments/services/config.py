@@ -11,17 +11,17 @@ from invenio_records_resources.services.records.config import (
     RecordServiceConfig,
     SearchOptions,
 )
-from invenio_records_resources.services.records.results import RecordItem, RecordList
 
-from geo_comments.comments.services import facets
-from geo_comments.comments.services.components import CommentData
-from geo_comments.comments.services.security.permission import CommentPermissionPolicy
+from . import facets
+from .components import CommentData
+from .results import RecordItem, RecordList
+from .security.permission import CommentPermissionPolicy
 
 
 class CommentSearchOptions(SearchOptions):
     """Search Options."""
 
-    facets = {"status": facets.status, "record": facets.record}
+    facets = {"status": facets.status}
 
 
 class CommentServiceConfig(RecordServiceConfig):

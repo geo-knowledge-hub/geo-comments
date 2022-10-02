@@ -7,5 +7,9 @@
 
 """Comments module configuration."""
 
+from invenio_users_resources.resolvers import UserResolver
+
 GEO_COMMENTS_AUTO_APPROVE = False
 """Enable automatic comment approval"""
+
+GEO_COMMENTS_ENTITY_RESOLVERS = [UserResolver()]
