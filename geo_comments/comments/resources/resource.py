@@ -62,6 +62,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
             route("PUT", routes["item"], self.update),
             route("DELETE", routes["item"], self.delete),
             route("GET", routes["item"], self.read),
+            route("GET", routes["metrics"], self.metrics),
             # Admin routes
             route("POST", routes["deny-item"], self.deny_comment),
             route("POST", routes["allow-item"], self.allow_comment),
@@ -105,7 +106,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
             g.identity,
             resource_requestctx.view_args["pid_value"],
             resource_requestctx.data or {},
-            auto_approve=current_app.config.get("GEO_COMMENT_AUTO_APPROVE", False),
+            auto_approve=current_app.config.get("GEO_COMMENTS_AUTO_APPROVE", False),
             expand=resource_requestctx.args.get("expand", False),
         )
         return item.to_dict(), 201
@@ -161,3 +162,15 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
         )
 
         return allowed_comment.to_dict(), 200
+
+    @request_comment_view_args
+    @request_extra_args
+    @response_handler(many=False)
+    def metrics(self):
+        """Read an item."""
+        item = self.service.metrics(
+            identity=g.identity,
+            associated_record_id=resource_requestctx.view_args["pid_value"],
+        )
+
+        return item.to_dict(), 200

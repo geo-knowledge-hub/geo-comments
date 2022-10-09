@@ -19,31 +19,35 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
 
 
 @pytest.mark.parametrize(
-    "service_name,comment_cls,record,comment_content",
+    "service_name,comment_cls,record,comment_content,use_metrics",
     [
         (
             "package_comment",
             PackageComment,
             lazy_fixture("record_package_simple"),
             lazy_fixture("comment_record_data"),
+            False,
         ),
         (
             "package_feedback",
             PackageFeedback,
             lazy_fixture("record_package_simple"),
             lazy_fixture("feedback_record_data"),
+            True,
         ),
         (
             "resource_comment",
             ResourceComment,
             lazy_fixture("record_resource_simple"),
             lazy_fixture("comment_record_data"),
+            False,
         ),
         (
             "resource_feedback",
             ResourceFeedback,
             lazy_fixture("record_resource_simple"),
             lazy_fixture("feedback_record_data"),
+            True,
         ),
     ],
 )
@@ -57,6 +61,7 @@ def test_service_basic_commenting_workflow(
     comment_cls,
     record,
     comment_content,
+    use_metrics,
 ):
     """Test basic commenting workflow using service."""
     # 1. Getting the correct service
@@ -113,3 +118,11 @@ def test_service_basic_commenting_workflow(
     assert search_result.total != 0
     assert next(search_result.hits).get("status") == CommentStatus.ALLOWED.value
     assert next(search_result.hits).get("user") == str(authenticated_identity.id)
+
+    # 6. Metrics
+    if use_metrics:
+        metrics_result = service.metrics(authenticated_identity, record.pid.pid_value)
+        metrics_result = metrics_result.to_dict()
+
+        assert "topics" in metrics_result
+        assert len(metrics_result["topics"]) == 2  # two topics

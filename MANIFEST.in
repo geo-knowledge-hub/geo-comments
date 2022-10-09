@@ -5,6 +5,9 @@
 # geo-comments is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
+prune docs/_build
+recursive-exclude docker *
+
 include .isort.cfg
 include .dockerignore
 include .editorconfig
@@ -16,7 +19,7 @@ include babel.ini
 include docs/requirements.txt
 include LICENSE
 include pytest.ini
-prune docs/_build
+
 recursive-include .github/workflows *.yml
 recursive-include .github/workflows-disabled *.yml
 recursive-include docs *.bat
@@ -25,15 +28,12 @@ recursive-include docs *.rst
 recursive-include docs *.json
 recursive-include docs *.yaml
 recursive-include docs Makefile
-recursive-include geo_comments *.po *.pot *.mo
-recursive-include geo_comments *.yaml *.py *.json
-recursive-include tests *.py *.csv *.json *.yaml
-
-# added by check-manifest
 recursive-include geo_comments *.py
-
-# added by check-manifest
-include *.py
-recursive-include docs *.json
-recursive-include docs *.yaml
+recursive-include geo_comments *.po
+recursive-include geo_comments *.pot
+recursive-include geo_comments *.mo
+recursive-include geo_comments *.yaml
 recursive-include geo_comments *.json
+recursive-include geo_comments *.html
+recursive-include geo_comments *.js
+recursive-include tests *.py *.csv *.json *.yaml

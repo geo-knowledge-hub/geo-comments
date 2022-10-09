@@ -43,3 +43,12 @@ class CommentLink(Link):
     def vars(record, vars):
         """Variables for the URI template."""
         vars.update({"comment_id": record.id, "pid_value": record.get("record")})
+
+
+class CommentMetricsLink(Link):
+    """Shortcut for writing comment metrics links."""
+
+    @staticmethod
+    def vars(record, vars):
+        """Variables for the URI template."""
+        vars.update({"pid_value": record.get("id")})
