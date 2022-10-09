@@ -25,6 +25,7 @@
         "type": "date"
       },
       "topics": {
+        "type": "nested",
         "properties": {
           "name": {
             "type": "keyword"

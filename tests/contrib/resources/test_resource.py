@@ -18,7 +18,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
 
 
 @pytest.mark.parametrize(
-    "service_prefix,service_resource,comment_cls,record,comment_content",
+    "service_prefix,service_resource,comment_cls,record,comment_content,use_metrics",
     [
         (
             "/packages",
@@ -26,6 +26,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             PackageComment,
             lazy_fixture("record_package_simple"),
             lazy_fixture("comment_record_data"),
+            False,
         ),
         (
             "/packages",
@@ -33,6 +34,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             PackageFeedback,
             lazy_fixture("record_package_simple"),
             lazy_fixture("feedback_record_data"),
+            True,
         ),
         (
             "/records",
@@ -40,6 +42,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             ResourceComment,
             lazy_fixture("record_resource_simple"),
             lazy_fixture("comment_record_data"),
+            False,
         ),
         (
             "/records",
@@ -47,6 +50,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             ResourceFeedback,
             lazy_fixture("record_resource_simple"),
             lazy_fixture("feedback_record_data"),
+            True,
         ),
     ],
 )
@@ -58,6 +62,7 @@ def test_resource_basic_commenting_workflow(
     comment_cls,
     record,
     comment_content,
+    use_metrics,
 ):
     """Test basic commenting workflow using service."""
     # 1. Log in with the basic user.
@@ -125,3 +130,12 @@ def test_resource_basic_commenting_workflow(
 
     assert search_result.status_code == 200
     assert search_result.json["hits"]["total"] != 0
+
+    # 6. Reading metrics (if enabled)
+    if use_metrics:
+        base_comments_url = f"{base_comments_url}/metrics"
+
+        metrics_result = client_with_login.get(base_comments_url)
+
+        assert metrics_result.status_code == 200
+        assert "topics" in metrics_result.json

@@ -52,6 +52,19 @@ class FeedbackCommentSchema(CommentSchema):
     )
 
 
+class FeedbackMetric(Schema):
+    """Feedback metric schema."""
+
+    name = SanitizedUnicode(required=True)
+    stats = fields.Dict(required=True)
+
+
+class FeedbackMetrics(Schema):
+    """Feedback metrics schema."""
+
+    topics = fields.List(cls_or_instance=fields.Nested(FeedbackMetric()), required=True)
+
+
 #
 # Auxiliary functions
 #

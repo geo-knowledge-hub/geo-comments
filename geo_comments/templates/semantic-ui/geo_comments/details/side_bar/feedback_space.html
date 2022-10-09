@@ -1,0 +1,14 @@
+{#
+  Copyright (C) 2022 GEO Secretariat.
+
+  geo-comments is free software; you can redistribute it and/or modify
+  it under the terms of the MIT License; see LICENSE file for more details.
+#}
+
+{% if not is_preview %}
+<section id="feedback-space" aria-label="{{ _('Feedback space') }}" class="ui segment rdm-sidebar">
+  <h2 class="ui small header">{{ _('Feedback space') }}</h2>
+  <div id="feedback-space-div" data-record='{{ record | tojson }}' data-default-query-config='{{ dict(size=config["GEO_COMMENTS_FEEDBACK_TIMELINE_PAGE_SIZE"]) | tojson }}'>
+  </div>
+</section>
+{% endif %}

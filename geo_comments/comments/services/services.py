@@ -12,6 +12,7 @@ from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.records import (
     RecordService as InvenioBaseService,
 )
+from invenio_records_resources.services.records.schema import ServiceSchemaWrapper
 from invenio_records_resources.services.uow import (
     RecordCommitOp,
     RecordDeleteOp,
@@ -21,6 +22,7 @@ from invenio_records_resources.services.uow import (
 from geo_comments.comments.records.api import CommentStatus
 
 from .links import ActionLinksTemplate
+from .metrics import RecordFeedbackMetrics
 from .results import EntityResolverExpandableField
 
 
@@ -288,4 +290,64 @@ class CommentService(InvenioBaseService):
         """Deny comment."""
         return self._change_comment_status(
             identity, comment_id, CommentStatus.DENIED, expand=expand, uow=uow
+        )
+
+
+class FeedbackService(CommentService):
+    """Specialized service for feedback management."""
+
+    #
+    # Properties
+    #
+    @property
+    def schema_metrics(self):
+        """Returns the data schema instance."""
+        return ServiceSchemaWrapper(self, schema=self.config.schema_metrics)
+
+    #
+    # Auxiliary methods
+    #
+    def result_metrics(self, *args, **kwargs):
+        """Create a metric operation result."""
+        return self.config.result_metrics_cls(*args, **kwargs)
+
+    #
+    # High-level API.
+    #
+    def metrics(
+        self,
+        identity,
+        associated_record_id,
+        record_cls=None,
+        search_opts=None,
+        permission_action="read",
+        es_preference=None,
+    ):
+        """Generate feedback metrics from a record."""
+        # Permissions
+        associated_record = self._get_associated_record(associated_record_id)
+        self.require_permission(
+            identity, "view_associated_record", record=associated_record
+        )
+
+        search = self.create_search(
+            identity,
+            record_cls or self.record_cls,
+            search_opts or self.config.search,
+            permission_action=permission_action,
+            preference=es_preference,
+            extra_filter=Q("term", **{"record": associated_record_id}),
+        )
+
+        # Generating metrics
+        feedback_metrics = RecordFeedbackMetrics(search).generate()
+
+        return self.result_metrics(
+            self,
+            identity,
+            associated_record,
+            feedback_metrics,
+            links_tpl=LinksTemplate(
+                self.config.links_item_metrics,
+            ),
         )

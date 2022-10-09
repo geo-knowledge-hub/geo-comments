@@ -25,11 +25,15 @@ from geo_comments.comments.records.systemfields.fields.entity import EntityField
 from geo_comments.comments.records.systemfields.models import UserEntity
 from geo_comments.comments.resources.config import CommentResourceConfig
 from geo_comments.comments.resources.resource import CommentResource
-from geo_comments.comments.schema import CommentSchema, FeedbackCommentSchema
+from geo_comments.comments.schema import (
+    CommentSchema,
+    FeedbackCommentSchema,
+    FeedbackMetrics,
+)
 from geo_comments.comments.services.config import CommentServiceConfig
-from geo_comments.comments.services.links import CommentLink
+from geo_comments.comments.services.links import CommentLink, CommentMetricsLink
 from geo_comments.comments.services.security.permission import CommentPermissionPolicy
-from geo_comments.comments.services.services import CommentService
+from geo_comments.comments.services.services import CommentService, FeedbackService
 
 
 #
@@ -69,6 +73,9 @@ class CommentTypeFactory:
         comment_service_schema=CommentSchema,
         comment_service_components=None,
         comment_service_id=None,
+        comment_service_base_cls=CommentService,
+        comment_service_use_metrics=False,
+        comment_service_schema_metrics=None,
         index_name="comments-comment-v1.0.0",
     ):
         """Initializer."""
@@ -99,11 +106,14 @@ class CommentTypeFactory:
             comment_service_endpoint_route_prefix
         )
 
+        self.comment_service_use_metrics = comment_service_use_metrics
         self.comment_service_id = comment_service_id
         self.comment_service_name = comment_service_name
         self.comment_service_permission_policy = comment_service_permission_policy
         self.comment_service_schema = comment_service_schema
         self.comment_service_components = comment_service_components
+        self.comment_service_base_cls = comment_service_base_cls
+        self.comment_service_schema_metrics = comment_service_schema_metrics
 
         self.comment_service_search_options = (
             comment_service_search_options or CommentServiceConfig.search
@@ -220,6 +230,7 @@ class CommentTypeFactory:
                 # General routes
                 "list": route,
                 "item": route + "/<comment_id>",
+                "metrics": route + "/metrics",
                 # Admin routes
                 "deny-item": route + "/<comment_id>/actions/deny",
                 "allow-item": route + "/<comment_id>/actions/allow",
@@ -276,6 +287,30 @@ class CommentTypeFactory:
                 dict(components=self.comment_service_components)
             )
 
+        if self.comment_service_use_metrics:
+            config_cls_attributes.update(
+                dict(
+                    links_item={
+                        "self": CommentLink("{+api}" + route + "/{comment_id}"),
+                        "metrics": CommentLink(
+                            "{+api}" + route + "/metrics",
+                        ),
+                    }
+                )
+            )
+
+            config_cls_attributes.update(
+                dict(
+                    links_item_metrics={
+                        "self": CommentMetricsLink("{+api}" + route + "/metrics")
+                    }
+                )
+            )
+
+            config_cls_attributes.update(
+                dict(schema_metrics=self.comment_service_schema_metrics)
+            )
+
         if self.comment_service_id:
             config_cls_attributes.update(
                 dict(
@@ -288,7 +323,9 @@ class CommentTypeFactory:
             config_cls_name, (CommentServiceConfig,), config_cls_attributes
         )
 
-        self.comment_service_cls = type(service_cls_name, (CommentService,), {})
+        self.comment_service_cls = type(
+            service_cls_name, (self.comment_service_base_cls,), {}
+        )
 
 
 #
@@ -332,5 +369,8 @@ class FeedbackTypeFactory(CommentTypeFactory):
             comment_record_cls_attr=comment_record_cls_attr,
             comment_model_cls_attr=comment_model_cls_attr,
             comment_service_schema=FeedbackCommentSchema,
+            comment_service_base_cls=FeedbackService,
+            comment_service_use_metrics=True,
+            comment_service_schema_metrics=FeedbackMetrics,
             **kwargs,
         )
