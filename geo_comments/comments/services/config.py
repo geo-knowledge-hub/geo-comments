@@ -14,7 +14,7 @@ from invenio_records_resources.services.records.config import (
 
 from . import facets
 from .components import CommentData
-from .results import RecordItem, RecordList
+from .results import RecordItem, RecordList, RecordMetricItem
 from .security.permission import CommentPermissionPolicy
 
 
@@ -28,6 +28,7 @@ class CommentServiceConfig(RecordServiceConfig):
     """Comment Service configuration."""
 
     schema = None
+    schema_metrics = None
 
     #
     # Common configurations
@@ -49,6 +50,7 @@ class CommentServiceConfig(RecordServiceConfig):
     # Results
     result_item_cls = RecordItem
     result_list_cls = RecordList
+    result_metrics_cls = RecordMetricItem
 
     # Components
     components = [CommentData]

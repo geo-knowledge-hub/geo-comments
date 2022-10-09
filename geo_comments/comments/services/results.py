@@ -8,6 +8,7 @@
 """Comment services results."""
 
 from invenio_records.dictutils import dict_lookup, dict_merge, dict_set
+from invenio_records_resources.services.base.results import ServiceItemResult
 from invenio_records_resources.services.records.results import ExpandableField
 from invenio_records_resources.services.records.results import (
     FieldsResolver as BaseFieldsResolver,
@@ -76,6 +77,45 @@ class FieldsResolver(BaseFieldsResolver):
                 dict_merge(results, d)
 
         return results
+
+
+class RecordMetricItem(ServiceItemResult):
+    """Result of metric operation."""
+
+    def __init__(self, service, identity, record, metrics, schema=None, links_tpl=None):
+        """Initializer."""
+        self._identity = identity
+        self._service = service
+        self._record = record
+        self._metrics = metrics
+        self._schema = schema or service.schema_metrics
+        self._links_tpl = links_tpl
+        self._data = None
+
+    @property
+    def links(self):
+        """Get links for this result item."""
+        return self._links_tpl.expand(self._record)
+
+    @property
+    def data(self):
+        """Property to get metric data."""
+        if self._data:
+            return self._data
+
+        self._data = self._schema.dump(
+            self._metrics,
+            context=dict(identity=self._identity, record=self._record),
+        )
+
+        if self._links_tpl:
+            self._data["links"] = self.links
+
+        return self._data
+
+    def to_dict(self):
+        """Get a dictionary for the metrics."""
+        return self.data
 
 
 class RecordItem(BaseRecordItem):

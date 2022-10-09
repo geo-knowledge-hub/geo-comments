@@ -13,3 +13,10 @@ GEO_COMMENTS_AUTO_APPROVE = False
 """Enable automatic comment approval"""
 
 GEO_COMMENTS_ENTITY_RESOLVERS = [UserResolver()]
+"""Entity resolver for the GEO Comments handled records (Package and record)."""
+
+GEO_COMMENTS_COMMENT_TIMELINE_PAGE_SIZE = 3
+"""Number of comments to be presented in the Comment timeline."""
+
+GEO_COMMENTS_FEEDBACK_TIMELINE_PAGE_SIZE = 3
+"""Number of comments to be presented in the Feedback timeline."""

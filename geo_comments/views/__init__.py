@@ -10,7 +10,7 @@
 
 from flask import Blueprint
 
-blueprint = Blueprint("geo_comments_ext", __name__)
+blueprint = Blueprint("geo_comments_ext", __name__, template_folder="../templates")
 
 
 @blueprint.record_once
