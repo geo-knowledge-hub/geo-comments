@@ -26,6 +26,7 @@ export const renderComponent = (...args) => {
     ReactDOM.render(
       <AskProviderApp
         record={JSON.parse(askTheProviderDiv.dataset.record)}
+        userIsAuthenticated={JSON.parse(askTheProviderDiv.dataset.userIsAuthenticated)}
         defaultQueryParams={JSON.parse(askTheProviderDiv.dataset.defaultQueryConfig)}
       />,
       askTheProviderDiv

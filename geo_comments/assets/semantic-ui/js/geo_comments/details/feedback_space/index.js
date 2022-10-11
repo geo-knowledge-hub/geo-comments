@@ -26,6 +26,7 @@ export const renderComponent = (...args) => {
     ReactDOM.render(
       <FeedbackApp
         record={JSON.parse(communityFeedbackDiv.dataset.record)}
+        userIsAuthenticated={JSON.parse(communityFeedbackDiv.dataset.userIsAuthenticated)}
         defaultQueryParams={JSON.parse(communityFeedbackDiv.dataset.defaultQueryConfig)}
       />,
       communityFeedbackDiv

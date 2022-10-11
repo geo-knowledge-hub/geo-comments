@@ -8,7 +8,10 @@
 {% if not is_preview %}
 <section id="feedback-space" aria-label="{{ _('Feedback space') }}" class="ui segment rdm-sidebar">
   <h2 class="ui small header">{{ _('Feedback space') }}</h2>
-  <div id="feedback-space-div" data-record='{{ record | tojson }}' data-default-query-config='{{ dict(size=config["GEO_COMMENTS_FEEDBACK_TIMELINE_PAGE_SIZE"]) | tojson }}'>
+  <div id="feedback-space-div"
+       data-record='{{ record | tojson }}'
+       data-user-is-authenticated='{{ current_user.is_authenticated | tojson }}'
+       data-default-query-config='{{ dict(size=config["GEO_COMMENTS_FEEDBACK_TIMELINE_PAGE_SIZE"]) | tojson }}'>
   </div>
 </section>
 {% endif %}
