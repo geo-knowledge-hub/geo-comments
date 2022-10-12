@@ -8,7 +8,10 @@
 {% if not is_preview %}
 <section id="get-in-touch-ask-provider" aria-label="{{ _('Engage') }}" class="ui segment rdm-sidebar">
     <h2 class="ui small header">{{ _('Any question ?') }}</h2>
-    <div id="ask-provider-div" data-record='{{ record | tojson }}' data-default-query-config='{{ dict(size=config["GEO_COMMENTS_COMMENT_TIMELINE_PAGE_SIZE"]) | tojson }}'>
+    <div id="ask-provider-div"
+         data-record='{{ record | tojson }}'
+         data-user-is-authenticated='{{ current_user.is_authenticated | tojson }}'
+         data-default-query-config='{{ dict(size=config["GEO_COMMENTS_COMMENT_TIMELINE_PAGE_SIZE"]) | tojson }}'>
     </div>
 </section>
 {% endif %}

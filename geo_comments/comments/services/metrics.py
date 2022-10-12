@@ -62,7 +62,7 @@ class RecordFeedbackMetrics(MetricsBuilder):
     def generate(self):
         """Generate the metrics."""
         # Configuring the search client.
-        _search = self._search.from_dict(self.metric)
+        _search = self._search.update_from_dict(self.metric)
 
         # Performing the search
         metrics_result = _search.execute()
