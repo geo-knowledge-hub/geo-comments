@@ -8,6 +8,7 @@
 """Comment service."""
 
 from elasticsearch_dsl import Q
+from invenio_rdm_records.proxies import current_rdm_records_service
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.records import (
     RecordService as InvenioBaseService,
@@ -66,7 +67,9 @@ class CommentService(InvenioBaseService):
         # searching
         comment = self.record_cls.get_record(id_=comment_id, with_denied=True)
 
-        self.require_permission(identity, "view_associated_record", comment=comment)
+        current_rdm_records_service.require_permission(
+            identity, "read", record=comment.record
+        )
         self.require_permission(identity, "change_state", comment=comment)
 
         # running the components
@@ -103,8 +106,8 @@ class CommentService(InvenioBaseService):
     ):
         """Create a comment record."""
         # Permissions
-        self.require_permission(
-            identity, "view_associated_record", record=associated_record
+        current_rdm_records_service.require_permission(
+            identity, "read", record=associated_record
         )
 
         # checking schema
@@ -172,8 +175,8 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id, with_denied=True)
 
         # Permissions
-        self.require_permission(
-            identity, "view_associated_record", record=comment.record
+        current_rdm_records_service.require_permission(
+            identity, "read", record=comment.record
         )
         self.require_permission(identity, "read", comment=comment)
 
@@ -191,8 +194,8 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id)
 
         # Permissions
-        self.require_permission(
-            identity, "view_associated_record", record=comment.record
+        current_rdm_records_service.require_permission(
+            identity, "read", record=comment.record
         )
         self.require_permission(identity, "update", comment=comment)
 
@@ -227,8 +230,8 @@ class CommentService(InvenioBaseService):
         comment = self.record_cls.get_record(id_=comment_id)
 
         # Permissions
-        self.require_permission(
-            identity, "view_associated_record", record=comment.record
+        current_rdm_records_service.require_permission(
+            identity, "read", record=comment.record
         )
         self.require_permission(identity, "delete", comment=comment)
 
@@ -255,8 +258,8 @@ class CommentService(InvenioBaseService):
 
         # Permissions
         associated_record = self._get_associated_record(associated_record_id)
-        self.require_permission(
-            identity, "view_associated_record", record=associated_record
+        current_rdm_records_service.require_permission(
+            identity, "read", record=associated_record
         )
 
         # Prepare and execute the search
@@ -332,8 +335,9 @@ class FeedbackService(CommentService):
         """Generate feedback metrics from a record."""
         # Permissions
         associated_record = self._get_associated_record(associated_record_id)
-        self.require_permission(
-            identity, "view_associated_record", record=associated_record
+
+        current_rdm_records_service.require_permission(
+            identity, "read", record=associated_record
         )
 
         search = self.create_search(

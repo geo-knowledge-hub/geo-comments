@@ -55,7 +55,7 @@ class BaseRecordEntity(EntityBase):
         """Create a Record entity from an object."""
         if instance and "record" in instance:
             record_identifier = dict_lookup(instance, "record")
-            obj = cls.entity_cls.pid.resolve(record_identifier)
+            obj = cls.entity_cls.pid.resolve(record_identifier, registered_only=False)
 
         else:
             # note: assuming the instance model class

@@ -7,11 +7,10 @@
 
 """Comment permission policy."""
 
-from invenio_rdm_records.services.permissions import RDMRecordPermissionPolicy
 from invenio_records_permissions.generators import (
+    AnyUser,
     AuthenticatedUser,
     SystemProcess,
-    AnyUser,
 )
 from invenio_records_permissions.policies.records import RecordPermissionPolicy
 
@@ -64,9 +63,3 @@ class CommentPermissionPolicy(RecordPermissionPolicy):
 
     # Allowing changing the comment state
     can_change_state = can_manage
-
-    #
-    # Comments - Related records
-    #
-
-    can_view_associated_record = RDMRecordPermissionPolicy.can_read
