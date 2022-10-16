@@ -53,7 +53,7 @@ class BaseRecordEntity(EntityBase):
     @classmethod
     def from_object(cls, instance):
         """Create a Record entity from an object."""
-        if type(instance) == dict:
+        if instance and "record" in instance:
             record_identifier = dict_lookup(instance, "record")
             obj = cls.entity_cls.pid.resolve(record_identifier)
 
@@ -84,7 +84,7 @@ class UserEntity(EntityBase):
     @classmethod
     def from_object(cls, instance):
         """Create a user entity from an object."""
-        if type(instance) == dict:
+        if instance and "user" in instance:
             user = dict_lookup(instance, "user")
 
         else:

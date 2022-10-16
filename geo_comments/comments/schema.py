@@ -71,6 +71,6 @@ class FeedbackMetrics(Schema):
 def generate_permission_schema_document(identity, service, obj):
     """Generate document used to create permission schemas."""
     return dict(
-        can_update=service.check_permission(identity, "update", event=obj),
-        can_delete=service.check_permission(identity, "delete", event=obj),
+        can_update=service.check_permission(identity, "update", comment=obj),
+        can_delete=service.check_permission(identity, "delete", comment=obj),
     )
