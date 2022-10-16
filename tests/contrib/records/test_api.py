@@ -66,8 +66,6 @@ def test_api_basic_commenting_workflow(users, record, comment_content, comment_c
 
     # 2.2.1. Checking if the loaded comment is correct
     assert comment.status == CommentStatus.DENIED.value
-    assert comment.user == package_comment_loaded.user
-    assert comment.record == package_comment_loaded.record
     assert comment.dumps() == package_comment_loaded.dumps()
 
     # 3. Updating a comment

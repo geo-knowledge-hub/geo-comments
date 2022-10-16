@@ -94,9 +94,9 @@ def test_service_basic_commenting_workflow(
     with pytest.raises(PermissionDeniedError):
         service.allow_comment(another_authenticated_identity, comment_id)
 
-    # 4.2. (ToDo) Trying using an unauthenticated user
-    # with pytest.raises(PermissionDeniedError):
-    #    service.allow_comment(anyuser_identity, comment_id)
+    # 4.2. Trying using an unauthenticated user
+    with pytest.raises(PermissionDeniedError):
+        service.allow_comment(anyuser_identity, comment_id)
 
     # 4.3. Trying using an admin user
     allowed_comment = service.allow_comment(superuser_identity, comment_id)
@@ -109,8 +109,8 @@ def test_service_basic_commenting_workflow(
     # 4.4.1. Reading with the owner of the comment
     service.read(authenticated_identity, comment_id)
 
-    # 4.4.2. (ToDo) Reading with an unauthenticated user
-    # service.read(anyuser_identity, comment_id)
+    # 4.4.2. Reading with an unauthenticated user
+    service.read(anyuser_identity, comment_id)
 
     # 5. Searching for the comment by record
     search_result = service.search(authenticated_identity, record.pid.pid_value)
