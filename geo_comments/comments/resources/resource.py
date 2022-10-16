@@ -63,6 +63,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
             route("DELETE", routes["item"], self.delete),
             route("GET", routes["item"], self.read),
             route("GET", routes["metrics"], self.metrics),
+            route("GET", routes["validate-user"], self.validate_user),
             # Admin routes
             route("POST", routes["deny-item"], self.deny_comment),
             route("POST", routes["allow-item"], self.allow_comment),
@@ -174,3 +175,15 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
         )
 
         return item.to_dict(), 200
+
+    @request_comment_view_args
+    @request_extra_args
+    @response_handler(many=False)
+    def validate_user(self):
+        """Read an item."""
+        result = self.service.validate_user(
+            identity=g.identity,
+            associated_record_id=resource_requestctx.view_args["pid_value"],
+        )
+
+        return result, 200

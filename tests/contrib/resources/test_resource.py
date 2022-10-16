@@ -18,7 +18,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
 
 
 @pytest.mark.parametrize(
-    "service_prefix,service_resource,comment_cls,record,comment_content,use_metrics",
+    "service_prefix,service_resource,comment_cls,record,comment_content,use_metrics,validate_user",
     [
         (
             "/packages",
@@ -26,6 +26,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             PackageComment,
             lazy_fixture("record_package_simple"),
             lazy_fixture("comment_record_data"),
+            False,
             False,
         ),
         (
@@ -35,6 +36,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             lazy_fixture("record_package_simple"),
             lazy_fixture("feedback_record_data"),
             True,
+            True,
         ),
         (
             "/records",
@@ -43,6 +45,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             lazy_fixture("record_resource_simple"),
             lazy_fixture("comment_record_data"),
             False,
+            False,
         ),
         (
             "/records",
@@ -50,6 +53,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             ResourceFeedback,
             lazy_fixture("record_resource_simple"),
             lazy_fixture("feedback_record_data"),
+            True,
             True,
         ),
     ],
@@ -63,6 +67,7 @@ def test_resource_basic_commenting_workflow(
     record,
     comment_content,
     use_metrics,
+    validate_user,
 ):
     """Test basic commenting workflow using service."""
     # 1. Log in with the basic user.
@@ -133,9 +138,19 @@ def test_resource_basic_commenting_workflow(
 
     # 6. Reading metrics (if enabled)
     if use_metrics:
-        base_comments_url = f"{base_comments_url}/metrics"
+        metrics_comments_url = f"{base_comments_url}/metrics"
 
-        metrics_result = client_with_login.get(base_comments_url)
+        metrics_result = client_with_login.get(metrics_comments_url)
 
         assert metrics_result.status_code == 200
         assert "topics" in metrics_result.json
+
+    # 7. Validating user
+    if validate_user:
+        user_comments_url = f"{base_comments_url}/actions/validate-user"
+
+        validate_user_result = client_with_login.get(user_comments_url)
+
+        assert validate_user_result.status_code == 200
+        assert "is_valid_to_create" in validate_user_result.json
+        assert validate_user_result.json["is_valid_to_create"] is True
