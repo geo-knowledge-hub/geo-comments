@@ -231,6 +231,7 @@ class CommentTypeFactory:
                 "list": route,
                 "item": route + "/<comment_id>",
                 "metrics": route + "/metrics",
+                "validate-user": route + "/actions/validate-user",
                 # Admin routes
                 "deny-item": route + "/<comment_id>/actions/deny",
                 "allow-item": route + "/<comment_id>/actions/allow",

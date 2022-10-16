@@ -157,6 +157,9 @@ class CommentService(InvenioBaseService):
         uow=None,
     ):
         """Create a comment record."""
+        # Basic permission
+        self.require_permission(identity, "create")
+
         associated_record = self._get_associated_record(associated_record_id)
 
         return self._create(
@@ -361,3 +364,27 @@ class FeedbackService(CommentService):
                 self.config.links_item_metrics,
             ),
         )
+
+    def validate_user(self, identity, associated_record_id):
+        """Check if a user is valid to create a feedback."""
+        # Permissions
+
+        # basic permission.
+        self.require_permission(identity, "create")
+
+        # associated record permission.
+        associated_record = self._get_associated_record(associated_record_id)
+
+        current_rdm_records_service.require_permission(
+            identity, "read", record=associated_record
+        )
+
+        # searching for feedback created by the user
+        # about the selected record.
+        results = self.config.record_cls.get_record_by_user_record(
+            associated_record.id, identity.id, with_denied=True
+        )
+
+        is_valid_to_create = len(results) == 0  # only one feedback can be created.
+
+        return dict(is_valid_to_create=is_valid_to_create)
