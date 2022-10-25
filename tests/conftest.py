@@ -112,6 +112,7 @@ def authenticated_identity(users):
     user_id = users[0].id
 
     identity = Identity(user_id)
+    identity.provides.add(any_user)
     identity.provides.add(UserNeed(user_id))
     identity.provides.add(authenticated_user)
     return identity
@@ -140,6 +141,7 @@ def anyuser_identity():
 def another_authenticated_identity():
     """System identity."""
     identity = Identity(5)
+    identity.provides.add(any_user)
     identity.provides.add(UserNeed(5))
     identity.provides.add(authenticated_user)
     return identity

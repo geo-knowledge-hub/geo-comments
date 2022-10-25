@@ -19,13 +19,14 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
 
 
 @pytest.mark.parametrize(
-    "service_name,comment_cls,record,comment_content,use_metrics",
+    "service_name,comment_cls,record,comment_content,use_metrics,validate_user",
     [
         (
             "package_comment",
             PackageComment,
             lazy_fixture("record_package_simple"),
             lazy_fixture("comment_record_data"),
+            False,
             False,
         ),
         (
@@ -34,6 +35,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             lazy_fixture("record_package_simple"),
             lazy_fixture("feedback_record_data"),
             True,
+            True,
         ),
         (
             "resource_comment",
@@ -41,12 +43,14 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             lazy_fixture("record_resource_simple"),
             lazy_fixture("comment_record_data"),
             False,
+            False,
         ),
         (
             "resource_feedback",
             ResourceFeedback,
             lazy_fixture("record_resource_simple"),
             lazy_fixture("feedback_record_data"),
+            True,
             True,
         ),
     ],
@@ -62,6 +66,7 @@ def test_service_basic_commenting_workflow(
     record,
     comment_content,
     use_metrics,
+    validate_user,
 ):
     """Test basic commenting workflow using service."""
     # 1. Getting the correct service
@@ -94,9 +99,9 @@ def test_service_basic_commenting_workflow(
     with pytest.raises(PermissionDeniedError):
         service.allow_comment(another_authenticated_identity, comment_id)
 
-    # 4.2. (ToDo) Trying using an unauthenticated user
-    # with pytest.raises(PermissionDeniedError):
-    #    service.allow_comment(anyuser_identity, comment_id)
+    # 4.2. Trying using an unauthenticated user
+    with pytest.raises(PermissionDeniedError):
+        service.allow_comment(anyuser_identity, comment_id)
 
     # 4.3. Trying using an admin user
     allowed_comment = service.allow_comment(superuser_identity, comment_id)
@@ -109,8 +114,8 @@ def test_service_basic_commenting_workflow(
     # 4.4.1. Reading with the owner of the comment
     service.read(authenticated_identity, comment_id)
 
-    # 4.4.2. (ToDo) Reading with an unauthenticated user
-    # service.read(anyuser_identity, comment_id)
+    # 4.4.2. Reading with an unauthenticated user
+    service.read(anyuser_identity, comment_id)
 
     # 5. Searching for the comment by record
     search_result = service.search(authenticated_identity, record.pid.pid_value)
@@ -126,3 +131,12 @@ def test_service_basic_commenting_workflow(
 
         assert "topics" in metrics_result
         assert len(metrics_result["topics"]) == 2  # two topics
+
+    # 7. User validation
+    if validate_user:
+        user_status = service.validate_user(
+            authenticated_identity, record.pid.pid_value
+        )
+
+        # User already have a feedback created.
+        assert user_status["is_valid_to_create"] is False

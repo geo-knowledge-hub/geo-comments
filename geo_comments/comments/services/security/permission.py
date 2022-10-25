@@ -7,8 +7,11 @@
 
 """Comment permission policy."""
 
-from invenio_rdm_records.services.generators import CommunityAction, SecretLinks
-from invenio_records_permissions.generators import AuthenticatedUser, SystemProcess
+from invenio_records_permissions.generators import (
+    AnyUser,
+    AuthenticatedUser,
+    SystemProcess,
+)
 from invenio_records_permissions.policies.records import RecordPermissionPolicy
 
 from .generators import CommentOwner, GeoSecretariat, IfDenied, RecordOwners
@@ -26,13 +29,12 @@ class CommentPermissionPolicy(RecordPermissionPolicy):
         RecordOwners(),
         GeoSecretariat(),
         SystemProcess(),
-        # ToDo: Review
         # CommunityAction("curate"),
     ]
 
     can_curate = can_manage + [CommentOwner()]
 
-    can_view_comments = [AuthenticatedUser(), SystemProcess()]
+    can_view_comments = [AnyUser(), SystemProcess()]
 
     can_authenticated = [AuthenticatedUser(), SystemProcess()]
 
@@ -61,15 +63,3 @@ class CommentPermissionPolicy(RecordPermissionPolicy):
 
     # Allowing changing the comment state
     can_change_state = can_manage
-
-    #
-    # Comments - Related records
-    #
-
-    can_view_associated_record = [
-        RecordOwners(),
-        SystemProcess(),
-        # ToDo: Review
-        # SecretLinks("view"),
-        # CommunityAction("view"),
-    ]
