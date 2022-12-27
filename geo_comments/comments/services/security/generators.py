@@ -50,7 +50,6 @@ class RecordOwners(Generator):
             return [UserNeed(owner.owner_id) for owner in record.parent.access.owners]
 
         else:
-
             if not comment:
                 return []
 
