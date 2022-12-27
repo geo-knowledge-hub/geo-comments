@@ -36,6 +36,7 @@ class CommentSchema(BaseRecordSchema):
 # Specialized comments schema
 #
 
+
 # Feedback
 class FeedbackTopicSchema(Schema):
     """Feedback Topic schema class."""
