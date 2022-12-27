@@ -31,7 +31,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
         ),
         (
             "/packages",
-            "/feedbacks",
+            "/feedback",
             PackageFeedback,
             lazy_fixture("record_package_simple"),
             lazy_fixture("feedback_record_data"),
@@ -49,7 +49,7 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
         ),
         (
             "/records",
-            "/feedbacks",
+            "/feedback",
             ResourceFeedback,
             lazy_fixture("record_resource_simple"),
             lazy_fixture("feedback_record_data"),

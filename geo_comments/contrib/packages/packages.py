@@ -38,6 +38,6 @@ package_feedbacks = FeedbackTypeFactory(
     comment_associated_metadata_cls=GEOPackageRecordMetadata,
     comment_service_id="package_feedback",
     comment_service_name="PackageFeedback",
-    comment_service_endpoint_route="/feedbacks",
+    comment_service_endpoint_route="/feedback",
     comment_service_endpoint_route_prefix="/packages",
 )
