@@ -26,7 +26,7 @@ servers:
 
 paths:
 
-  /feedbacks:
+  /feedback:
 
     post:
       parameters:
@@ -126,7 +126,7 @@ paths:
         '404':
           $ref: '#/components/responses/InvalidUserFeedbackID'
 
-  /feedbacks/actions/deny:
+  /feedback/actions/deny:
     post:
       parameters:
         - name: id
@@ -150,7 +150,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-  /feedbacks/actions/allow:
+  /feedback/actions/allow:
     post:
       parameters:
         - name: id

@@ -41,7 +41,7 @@ theme = WebpackThemeBundle(
                 "i18next": "^20.3.0",
                 "i18next-browser-languagedetector": "^6.1.0",
                 "react-i18next": "^11.11.0",
-                "@geo-knowledge-hub/geo-comments-react": "0.1.1",
+                "@geo-knowledge-hub/geo-comments-react": "0.2.2",
             },
             aliases={
                 "@js/geo_comments": "js/geo_comments",
