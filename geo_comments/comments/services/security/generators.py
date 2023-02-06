@@ -10,12 +10,11 @@
 import operator
 from functools import reduce
 
-from elasticsearch_dsl.query import Q
 from flask_principal import UserNeed
 from geo_config.security.generators import GeoSecretariat as GeoSecretariatBaseGenerator
 from geo_config.security.generators import IfIsEqual
-from invenio_access.permissions import authenticated_user
 from invenio_records_permissions.generators import Generator
+from invenio_search.engine import dsl
 
 
 class GeoSecretariat(GeoSecretariatBaseGenerator):
@@ -23,7 +22,7 @@ class GeoSecretariat(GeoSecretariatBaseGenerator):
 
     def query_filter(self, identity=None, **kwargs):
         """Filters for current identity as super user."""
-        return Q("match", **{"status": "D"}) | Q("match", **{"status": "A"})
+        return dsl.Q("match", **{"status": "D"}) | dsl.Q("match", **{"status": "A"})
 
 
 class CommentOwner(Generator):
@@ -38,7 +37,7 @@ class CommentOwner(Generator):
     def query_filter(self, identity=None, **kwargs):
         """Filters for current identity as super user."""
         if identity.id:
-            return Q("term", **{"user": identity.id})
+            return dsl.Q("term", **{"user": identity.id})
 
 
 class RecordOwners(Generator):
@@ -87,8 +86,8 @@ class IfDenied(IfIsEqual):
 
     def query_filter(self, **kwargs):
         """Filters for allowed or denied records."""
-        q_denied = Q("match", **{"status": "D"})
-        q_allowed = Q("match", **{"status": "A"})
+        q_denied = dsl.Q("match", **{"status": "D"})
+        q_allowed = dsl.Q("match", **{"status": "A"})
 
         then_query = self.make_query(self.then_, **kwargs)
         else_query = self.make_query(self.else_, **kwargs)

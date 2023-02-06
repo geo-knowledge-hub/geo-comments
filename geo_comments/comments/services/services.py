@@ -7,7 +7,6 @@
 
 """Comment service."""
 
-from elasticsearch_dsl import Q
 from invenio_rdm_records.proxies import current_rdm_records_service
 from invenio_records_resources.services import LinksTemplate
 from invenio_records_resources.services.records import (
@@ -19,6 +18,7 @@ from invenio_records_resources.services.uow import (
     RecordDeleteOp,
     unit_of_work,
 )
+from invenio_search.engine import dsl
 
 from geo_comments.comments.records.api import CommentStatus
 
@@ -253,7 +253,12 @@ class CommentService(InvenioBaseService):
         return True
 
     def search(
-        self, identity, associated_record_id, params=None, es_preference=None, **kwargs
+        self,
+        identity,
+        associated_record_id,
+        params=None,
+        search_preference=None,
+        **kwargs
     ):
         """Search for records matching the querystring."""
         params = params or {}
@@ -270,8 +275,8 @@ class CommentService(InvenioBaseService):
             "search",
             identity,
             params,
-            es_preference,
-            extra_filter=Q("term", record=str(associated_record_id)),
+            search_preference,
+            extra_filter=dsl.Q("term", record=str(associated_record_id)),
             **kwargs
         )
         search_result = search.execute()
@@ -333,7 +338,7 @@ class FeedbackService(CommentService):
         record_cls=None,
         search_opts=None,
         permission_action="read",
-        es_preference=None,
+        search_preference=None,
     ):
         """Generate feedback metrics from a record."""
         # Permissions
@@ -348,8 +353,8 @@ class FeedbackService(CommentService):
             record_cls or self.record_cls,
             search_opts or self.config.search,
             permission_action=permission_action,
-            preference=es_preference,
-            extra_filter=Q("term", **{"record": associated_record_id}),
+            preference=search_preference,
+            extra_filter=dsl.Q("term", **{"record": associated_record_id}),
         )
 
         # Generating metrics

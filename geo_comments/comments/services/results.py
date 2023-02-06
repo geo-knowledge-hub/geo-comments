@@ -95,7 +95,7 @@ class RecordMetricItem(ServiceItemResult):
     @property
     def links(self):
         """Get links for this result item."""
-        return self._links_tpl.expand(self._record)
+        return self._links_tpl.expand(self._identity, self._record)
 
     @property
     def data(self):
