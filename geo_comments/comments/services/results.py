@@ -53,7 +53,7 @@ class FieldsResolver(BaseFieldsResolver):
 
         return grouped_values
 
-    def expand(self, hit):
+    def expand(self, identity, hit):
         """Return the expanded fields for the given hit."""
         results = dict()
         for field in self._fields:
@@ -67,7 +67,7 @@ class FieldsResolver(BaseFieldsResolver):
                 resolved_rec = field.get_dereferenced_record(service, v)
                 if not resolved_rec:
                     continue
-                output = field.pick(resolved_rec)
+                output = field.pick(identity, resolved_rec)
 
                 # transform field name (potentially dotted) to nested dicts
                 # to keep the nested structure of the field
@@ -199,6 +199,6 @@ class EntityResolverExpandableField(ExpandableField):
         service = _resolver.get_service()
         return v, service
 
-    def pick(self, resolved_rec):
+    def pick(self, identity, resolved_rec):
         """Pick fields defined in the entity resolvers."""
-        return self.entity_proxy.pick_resolved_fields(resolved_rec)
+        return self.entity_proxy.pick_resolved_fields(identity, resolved_rec)
