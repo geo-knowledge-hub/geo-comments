@@ -20,7 +20,7 @@ class ActionLinksTemplate(LinksTemplate):
 
         self._links_action = links_action
 
-    def expand(self, obj):
+    def expand(self, identity, obj):
         """Expand all the link templates."""
         links = {"actions": {}}
         ctx = self.context

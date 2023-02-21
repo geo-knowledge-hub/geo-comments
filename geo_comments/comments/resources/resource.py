@@ -18,7 +18,7 @@ from flask_resources import (
 )
 from invenio_records_resources.resources.errors import ErrorHandlersMixin
 from invenio_records_resources.resources.records.resource import request_extra_args
-from invenio_records_resources.resources.records.utils import es_preference
+from invenio_records_resources.resources.records.utils import search_preference
 from sqlalchemy.exc import IntegrityError
 
 from geo_comments.comments.resources.parser import (
@@ -79,7 +79,7 @@ class CommentResource(CommentErrorHandlersMixin, Resource):
             identity=g.identity,
             associated_record_id=resource_requestctx.view_args["pid_value"],
             params=resource_requestctx.args,
-            es_preference=es_preference(),
+            search_preference=search_preference(),
             expand=resource_requestctx.args.get("expand", False),
         )
         return hits.to_dict(), 200
