@@ -20,4 +20,4 @@ def send_notification_email():
     record_service = current_rdm_records_service
     comment_service = current_comments.resource_feedback_service
 
-    notify_comments(record_service, comment_service, "feedback message")
+    notify_comments(record_service, comment_service, "resource", "feedback message")

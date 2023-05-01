@@ -19,6 +19,7 @@ from sqlalchemy.exc import NoResultFound
 def notify_comments(
     record_service,
     comment_service,
+    record_type,
     notification_type,
     notification_template="geo_comments/email/notification.html",
 ):
@@ -51,6 +52,9 @@ def notify_comments(
     # if a user creates a comment and, after two hours, updates it. In this case,
     # the authors will be notified twice.
     query = f"updated:[{interval}]"
+
+    # Adding the type of the record to avoid service errors
+    query = f"{query} AND type:{record_type}"
 
     # Searching for new comments
     res = comment_service.scan(system_identity, q=query)
@@ -112,7 +116,7 @@ def notify_comments(
         if record_owners_email:
             # Creating e-mail subject
             title = notification_type.lower()
-            title = f"{record_title}: New {title}"
+            title = f"New {title}: {record_title}"
 
             # Preparing notification
             message = TemplatedMessage(
