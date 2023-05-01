@@ -24,6 +24,9 @@
       "updated": {
         "type": "date"
       },
+      "type": {
+        "type": "keyword"
+      },
       "topics": {
         "type": "nested",
         "properties": {

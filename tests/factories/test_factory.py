@@ -33,6 +33,7 @@ def test_model_class_create(type_factory, type_name, record_entity):
 
     package_feedbacks = type_factory(
         comment_type_name=type_name,
+        comment_record_type_name=type_name,
         comment_record_entity_cls=record_entity,
         comment_associated_record_cls=GEOPackageRecord,
         comment_associated_metadata_cls=GEOPackageRecordMetadata,
@@ -48,6 +49,7 @@ def test_model_class_create(type_factory, type_name, record_entity):
 
     resource_feedbacks = type_factory(
         comment_type_name=type_name,
+        comment_record_type_name=type_name,
         comment_record_entity_cls=record_entity,
         comment_associated_record_cls=GEOPackageRecord,
         comment_associated_metadata_cls=GEOPackageRecordMetadata,

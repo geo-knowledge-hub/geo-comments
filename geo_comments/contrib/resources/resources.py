@@ -19,6 +19,7 @@ from .systemfield import RecordEntity
 #
 resource_comments = CommentTypeFactory(
     comment_type_name="ResourceComment",
+    comment_record_type_name="resource",
     comment_record_entity_cls=RecordEntity,
     comment_associated_record_cls=GEORecord,
     comment_associated_metadata_cls=GEORecordMetadata,
@@ -33,6 +34,7 @@ resource_comments = CommentTypeFactory(
 #
 resource_feedbacks = FeedbackTypeFactory(
     comment_type_name="ResourceFeedback",
+    comment_record_type_name="resource",
     comment_record_entity_cls=RecordEntity,
     comment_associated_record_cls=GEORecord,
     comment_associated_metadata_cls=GEORecordMetadata,

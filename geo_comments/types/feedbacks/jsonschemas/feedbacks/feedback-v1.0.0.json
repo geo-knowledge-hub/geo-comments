@@ -25,6 +25,9 @@
     "user": {
       "$ref": "local://comments/definitions-v1.0.0.json#/user"
     },
+    "type": {
+      "type": "string"
+    },
     "record": {
       "type": "string"
     }
