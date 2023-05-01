@@ -9,12 +9,23 @@
 Changes
 =======
 
+Version 0.4.0 (2023-05-01)
+--------------------------
+
+- Added ``type`` field to the comments mapping.
+
+Version 0.3.0 (2023-03-02)
+--------------------------
+
+- Added mappings compatibility with OpenSearch;
+- Fixed Resolver interface compatibility with Invenio Records Resources.
+
 Version 0.2.0 (2023-01-05)
 --------------------------
 
 - Initial public release;
 - Introduced comments APIs
-  
+
   - Feedback API: Specialized API to enable users to create feedback about packages and resources;
   - Comments API: Specialized API to enable users to share knowledge using comments.
 

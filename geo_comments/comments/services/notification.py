@@ -19,6 +19,7 @@ from sqlalchemy.exc import NoResultFound
 def notify_comments(
     record_service,
     comment_service,
+    record_type,
     notification_type,
     notification_template="geo_comments/email/notification.html",
 ):
@@ -52,6 +53,9 @@ def notify_comments(
     # the authors will be notified twice.
     query = f"updated:[{interval}]"
 
+    # Adding the type of the record to avoid service errors
+    query = f"{query} AND type:{record_type}"
+
     # Searching for new comments
     res = comment_service.scan(system_identity, q=query)
     res = res.to_dict()
@@ -73,6 +77,7 @@ def notify_comments(
             record_metadata = record_service.read(system_identity, comment["record"])
             record_metadata = record_metadata.to_dict()
 
+            record_title = record_metadata["metadata"]["title"]
             record_owners = record_metadata["parent"]["access"]["owned_by"]
         except (PIDDoesNotExistError, NoResultFound):
             # ToDo: This is not the final solution! This is a temporary one,
@@ -109,8 +114,13 @@ def notify_comments(
         processed_records.append(comment["record"])
 
         if record_owners_email:
+            # Creating e-mail subject
+            title = notification_type.lower()
+            title = f"New {title}: {record_title}"
+
             # Preparing notification
             message = TemplatedMessage(
+                subject=title,
                 template_html=notification_template,
                 recipients=record_owners_email,
                 ctx=dict(record=record_metadata, notification_type=notification_type),

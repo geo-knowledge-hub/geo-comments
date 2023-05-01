@@ -18,6 +18,9 @@
       "user": {
         "type": "keyword"
       },
+      "type": {
+        "type": "keyword"
+      },
       "created": {
         "type": "date"
       },

@@ -58,6 +58,7 @@ class CommentTypeFactory:
     def __init__(
         self,
         comment_type_name,
+        comment_record_type_name,
         comment_record_entity_cls,
         comment_associated_record_cls,
         comment_associated_metadata_cls,
@@ -88,6 +89,7 @@ class CommentTypeFactory:
         self.comment_model_cls_attr = comment_model_cls_attr or {}
         self.comment_record_cls_attr = comment_record_cls_attr or {}
         self.comment_record_entity_cls = comment_record_entity_cls
+        self.comment_record_type_name = comment_record_type_name
 
         self.comment_associated_record_cls = comment_associated_record_cls
         self.comment_associated_metadata_cls = comment_associated_metadata_cls
@@ -206,6 +208,9 @@ class CommentTypeFactory:
         # Record
         record_class_attributes["record"] = EntityField(
             key="record", entity_obj_class=self.comment_record_entity_cls
+        )
+        record_class_attributes["type"] = ConstantField(
+            "type", self.comment_record_type_name
         )
 
         self.comment_cls = type(
@@ -339,6 +344,7 @@ class FeedbackTypeFactory(CommentTypeFactory):
         self,
         comment_type_name,
         comment_record_entity_cls,
+        comment_record_type_name,
         comment_associated_record_cls,
         comment_associated_metadata_cls,
         **kwargs,
@@ -362,6 +368,7 @@ class FeedbackTypeFactory(CommentTypeFactory):
 
         super().__init__(
             comment_type_name,
+            comment_record_type_name,
             comment_record_entity_cls,
             comment_associated_record_cls,
             comment_associated_metadata_cls,
