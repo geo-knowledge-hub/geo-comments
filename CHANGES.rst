@@ -9,6 +9,11 @@
 Changes
 =======
 
+Version 0.4.1 (2023-05-28)
+--------------------------
+
+- Added new e-mail notification template.
+
 Version 0.4.0 (2023-05-01)
 --------------------------
 
