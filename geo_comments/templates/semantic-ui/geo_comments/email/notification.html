@@ -1,127 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GEO Knowledge Hub | Email Notification</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto&display=swap" rel="stylesheet">
-
   <style>
-    * {
+    body {
+      font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
       margin: 0;
       padding: 0;
     }
 
-    a {
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 0.3rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      color: #526479;
+    }
+
+    .logo {
+      display: inline-block;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #333;
+      margin-top: 0;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .main-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .btn {
+      display: block;
+      color: #FFF;
+      background-color: #2185D0;
+      text-align: center;
+      padding: .65em 1.5em .65em;
+      border-radius: .35rem;
       text-decoration: none;
     }
 
-    h1,
-    h2 {
-      font-family: 'Poppins', sans-serif;
+    .btn:hover {
+      background-color: #1678c2;
     }
 
-    p,
-    span {
-      font-family: 'Roboto', sans-serif;
-
-    }
-
-    :root {
-      --background-container: #f0f0f0;
-      --background-response-box: #fff;
-      --text-default: #636e72;
-    }
-
-    body {
-      background: var(--background-container);
-    }
-
-    .container {
-      max-width: 37.5rem;
-      margin: 0 auto;
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 0.35rem;
+      padding: 10px;
       display: flex;
+      flex: 1 1 300px;
       flex-direction: column;
-      align-items: center;
-      flex-wrap: wrap;
-      padding: .5rem;
-      border-radius: 4px;
+      justify-content: space-between;
+      margin-top: 10px;
     }
 
-    .logo-box {
-      margin-top: 2.5rem;
-      margin-bottom: 2rem;
-      padding: 1rem;
+    .card-header {
+      font-size: 1.2rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
     }
 
-    .logo-box h1 {
-      line-height: 2.43rem;
-      margin-top: 1.5rem;
-      letter-spacing: 2px;
+    .link {
+      color: #2185D0;
+      text-decoration: none;
+      background-color: #f2f2f2;
+      padding: 5px;
+      border-radius: 5px;
+      align-self: flex-end;
     }
 
-    .response-box {
-      display: flex;
-      flex-direction: column;
-      background: var(--background-response-box);
-      border-radius: 4px;
-      width: 25rem;
-      height: 8rem;
-      padding: 1rem;
-
+    .link:hover {
+      background-color: #e6e6e6;
     }
 
-    .response-box p, a {
-      font-size: 1.125rem;
-      align-self: center;
-      color: var(--text-default);
-      margin-bottom: 2.5rem;
-    }
-
-    .response-box h2 {
-      font-size: 2rem;
-      align-self: center;
-    }
-
-    .response-box b {
-      align-self: center;
+    .footer {
+      margin-top: 20px;
+      font-size: 0.875rem;
       text-align: center;
-    }
-
-    @media(max-width: 450px) {
-      .response-box {
-        padding: 3rem;
-        width: 25rem;
-      }
-
-      .logo-box {
-        width: 25rem;
-      }
-    }
-
-    @media(min-width: 780px) {
-      .response-box {
-        padding: 3rem;
-        width: 32rem;
-      }
-    }
-
-    @media(max-width: 350px) {
-      .logo-box h1 {
-        font-size: 1.85rem;
-      }
     }
   </style>
 </head>
-
 <body>
 <div class="container">
-  <div class="logo-box">
-    <div>
+  <div class="header">
+    <div class="logo">
       <svg viewbox="0 0 780 300" width="100%" height="100%" preserveAspectRatio="xMinYMin meet">
         <?xml version="1.0" encoding="UTF-8" standalone="no"?>
         <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#"
@@ -130,12 +111,14 @@
              xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" x="0px" y="0px" width="768"
              height="254" viewBox="0 0 768 254" enable-background="new 0 0 768 494" xml:space="preserve" id="svg2"
              inkscape:version="0.91 r13725" sodipodi:docname="geo_knowledge_hub_blue.svg"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://purl.org/dc/elements/1.1/ "><metadata id="metadata92"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://purl.org/dc/elements/1.1/ "><metadata id="metadata92"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
           rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><dc:title/></cc:Work></rdf:RDF></metadata>
           <defs id="defs90"/>
           <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10"
                               gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2"
-                              inkscape:window-width="1855" inkscape:window-height="1056" id="namedview88" showgrid="false"
+                              inkscape:window-width="1855" inkscape:window-height="1056" id="namedview88"
+                              showgrid="false"
                               inkscape:zoom="1.2575195" inkscape:cx="255.91023" inkscape:cy="214.70076"
                               inkscape:window-x="65" inkscape:window-y="24" inkscape:window-maximized="1"
                               inkscape:current-layer="svg2"/>
@@ -177,13 +160,29 @@
     </div>
     <h1>New notification</h1>
   </div>
-  <div class="response-box">
-    <p>You have a new {{notification_type}} in the following record:</p>
-    <b>
-      <a href="{{ record.links.self_html }}" target="_blank">{{ record.metadata.title }}</a>
-    </b>
+  <div class="main-content">
+    <div>
+      <p>
+        You have a new {{notification_type}} in the following record:
+      </p>
+    </div>
+    <div class="card">
+      <div class="card-header">Record Details</div>
+      <h2>{{ record.metadata.title }}</h2>
+      <a href="{{ record.links.self_html }}" class="link">View record</a>
+    </div>
+    <div>
+      <p>
+        You can review the {{notification_type}} details by clicking the button below:
+      </p>
+      <a href="{{ record.links.self_html }}" class="btn">Review {{notification_type}}</a>
+    </div>
+  </div>
+  <div class="footer">
+    <p>
+      This email was sent by <strong>GEO Knowledge Hub</strong>
+    </p>
   </div>
 </div>
 </body>
-
 </html>
