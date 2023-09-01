@@ -10,6 +10,7 @@ Changes
 =======
 
 Version 0.5.0 (2023-09-01)
+--------------------------
 
 - Updated ``GEO RDM Records`` to version `0.7.0 <https://github.com/geo-knowledge-hub/geo-rdm-records/blob/master/CHANGES.rst#version-070-2023-09-01>`_.
 
