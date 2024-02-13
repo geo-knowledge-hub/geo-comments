@@ -7,7 +7,7 @@
 
 """Contrib - comments and feedbacks for Packages API."""
 
-from geo_rdm_records.customizations.records.api import GEORecord
+from geo_rdm_records.modules.rdm.records.api import GEORecord
 from invenio_rdm_records.records.models import RDMRecordMetadata as GEORecordMetadata
 
 from geo_comments.factories import CommentTypeFactory, FeedbackTypeFactory

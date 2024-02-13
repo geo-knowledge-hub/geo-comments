@@ -7,7 +7,7 @@
 
 """Contrib - System field for packages comments and feedbacks."""
 
-from geo_rdm_records.customizations.records.api import GEORecord
+from geo_rdm_records.modules.rdm.records.api import GEORecord
 
 from geo_comments.comments.records.systemfields.models import BaseRecordEntity
 
