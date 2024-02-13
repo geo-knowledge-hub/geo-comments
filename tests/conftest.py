@@ -11,8 +11,8 @@ import pytest
 from flask_principal import Identity, RoleNeed, UserNeed
 from flask_security import login_user
 from flask_security.utils import hash_password
-from geo_rdm_records.customizations.records.api import GEORecord
 from geo_rdm_records.modules.packages.records.api import GEOPackageRecord
+from geo_rdm_records.modules.rdm.records.api import GEORecord
 from geo_rdm_records.proxies import current_geo_packages_service
 from invenio_access.models import ActionRoles
 from invenio_access.permissions import (
@@ -48,13 +48,13 @@ def app_config(app_config):
     """Mimic an instance's configuration."""
     app_config["JSONSCHEMAS_HOST"] = "localhost"
 
-    app_config[
-        "RECORDS_REFRESOLVER_CLS"
-    ] = "invenio_records.resolver.InvenioRefResolver"
+    app_config["RECORDS_REFRESOLVER_CLS"] = (
+        "invenio_records.resolver.InvenioRefResolver"
+    )
 
-    app_config[
-        "RECORDS_REFRESOLVER_STORE"
-    ] = "invenio_jsonschemas.proxies.current_refresolver_store"
+    app_config["RECORDS_REFRESOLVER_STORE"] = (
+        "invenio_jsonschemas.proxies.current_refresolver_store"
+    )
 
     return app_config
 

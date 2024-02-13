@@ -5,4 +5,4 @@
 # geo-feedback is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
--e git+https://github.com/geo-knowledge-hub/geo-rdm-records@b-0.6#egg=geo-rdm-records
+-e git+https://github.com/geo-knowledge-hub/geo-rdm-records@b-0.8#egg=geo-rdm-records

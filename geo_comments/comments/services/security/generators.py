@@ -11,8 +11,10 @@ import operator
 from functools import reduce
 
 from flask_principal import UserNeed
-from geo_config.security.generators import GeoSecretariat as GeoSecretariatBaseGenerator
-from geo_config.security.generators import IfIsEqual
+from geo_rdm_records.modules.security.generators import (
+    GeoSecretariat as GeoSecretariatBaseGenerator,
+)
+from geo_rdm_records.modules.security.generators import IfIsEqual
 from invenio_records_permissions.generators import Generator
 from invenio_search.engine import dsl
 
