@@ -16,7 +16,10 @@ from sqlalchemy.dialects import mysql, postgresql
 revision = "9ee00acd3274"
 down_revision = "f79e92a678f0"
 branch_labels = ()
-depends_on = "9e0ac518b9df"
+depends_on = (
+    "9e0ac518b9df",
+    "14df88fb94fa",
+)
 
 
 def upgrade():
