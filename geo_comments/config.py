@@ -20,3 +20,6 @@ GEO_COMMENTS_COMMENT_TIMELINE_PAGE_SIZE = 3
 
 GEO_COMMENTS_FEEDBACK_TIMELINE_PAGE_SIZE = 3
 """Number of comments to be presented in the Feedback timeline."""
+
+GEO_COMMENTS_FEEDBACK_CURATORS = []
+"""Default Instance curators."""

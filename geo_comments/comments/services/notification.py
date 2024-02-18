@@ -13,6 +13,7 @@ from invenio_access.permissions import system_identity
 from invenio_mail.api import TemplatedMessage
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_users_resources.proxies import current_users_service
+from pydash import py_
 from sqlalchemy.exc import NoResultFound
 
 
@@ -64,7 +65,14 @@ def notify_comments(
 
     # Filtering the owners email
     processed_records = []
-    record_owners_email = []
+
+    # The variable `NOTIFICATION_DEFAULT_RECEIVER_EMAILS` is defined in the GEO RDM Records module,
+    # and it's used to notify instance administrators about new requests. As the GEO RDM Records is a
+    # dependency of the GEO Comments, we decided to use it as a default list to receive notifications
+    # about new comments/feedback.
+    record_owners_email = current_app.config[
+        "GEO_RDM_NOTIFICATION_DEFAULT_RECEIVER_EMAILS"
+    ]
 
     for comment in comments:
         # Avoiding sending many emails to the same
@@ -112,6 +120,9 @@ def notify_comments(
 
         # Saving the reference to the record
         processed_records.append(comment["record"])
+
+        # Removing duplications
+        record_owners_email = py_.uniq(record_owners_email)
 
         if record_owners_email:
             # Creating e-mail subject
