@@ -34,3 +34,17 @@ def create_resource_feedback_api_blueprint(app):
     ext = app.extensions["geo-comments"]
 
     return ext.resource_feedback_resource.as_blueprint()
+
+
+def create_marketplace_item_comment_api_blueprint(app):
+    """Create the Package's resource comments API Blueprint."""
+    ext = app.extensions["geo-comments"]
+
+    return ext.marketplace_item_comment_resource.as_blueprint()
+
+
+def create_marketplace_item_feedback_api_blueprint(app):
+    """Create the Package's resource feedbacks API Blueprint."""
+    ext = app.extensions["geo-comments"]
+
+    return ext.marketplace_item_feedback_resource.as_blueprint()

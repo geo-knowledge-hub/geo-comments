@@ -11,9 +11,13 @@ import pytest
 from flask_principal import Identity, RoleNeed, UserNeed
 from flask_security import login_user
 from flask_security.utils import hash_password
+from geo_rdm_records.modules.marketplace.records.api import GEOMarketplaceItem
 from geo_rdm_records.modules.packages.records.api import GEOPackageRecord
 from geo_rdm_records.modules.rdm.records.api import GEORecord
-from geo_rdm_records.proxies import current_geo_packages_service
+from geo_rdm_records.proxies import (
+    current_geo_packages_service,
+    current_marketplace_service,
+)
 from invenio_access.models import ActionRoles
 from invenio_access.permissions import (
     any_user,
@@ -317,3 +321,18 @@ def record_package_simple(
     )
 
     return GEOPackageRecord.pid.resolve(record_item["id"])
+
+
+@pytest.fixture(scope="module")
+def record_marketplace_item_simple(
+    location, resource_type_v, authenticated_identity, minimal_record
+):
+    """Basic Package Record."""
+    record_item = current_marketplace_service.create(
+        authenticated_identity, minimal_record
+    )
+    record_item = current_marketplace_service.publish(
+        authenticated_identity, record_item["id"]
+    )
+
+    return GEOMarketplaceItem.pid.resolve(record_item["id"])
