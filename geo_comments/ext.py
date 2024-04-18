@@ -8,6 +8,18 @@
 """Comments module for GEO Knowledge Hub."""
 
 from geo_comments import config
+from geo_comments.contrib.marketplace.comments import (
+    MarketplaceItemCommentResource,
+    MarketplaceItemCommentResourceConfig,
+    MarketplaceItemCommentService,
+    MarketplaceItemCommentServiceConfig,
+)
+from geo_comments.contrib.marketplace.feedbacks import (
+    MarketplaceItemFeedbackResource,
+    MarketplaceItemFeedbackResourceConfig,
+    MarketplaceItemFeedbackService,
+    MarketplaceItemFeedbackServiceConfig,
+)
 from geo_comments.contrib.packages.comments import (
     PackageCommentResource,
     PackageCommentResourceConfig,
@@ -72,6 +84,13 @@ class GEOComments(object):
             config=ResourceFeedbackServiceConfig
         )
 
+        self.marketplace_item_comment_service = MarketplaceItemCommentService(
+            config=MarketplaceItemCommentServiceConfig
+        )
+        self.marketplace_item_feedback_service = MarketplaceItemFeedbackService(
+            config=MarketplaceItemFeedbackServiceConfig
+        )
+
     def init_resources(self, app):
         """Initialize the resources."""
         self.package_comment_resource = PackageCommentResource(
@@ -87,4 +106,13 @@ class GEOComments(object):
         self.resource_feedback_resource = ResourceFeedbackResource(
             service=self.resource_feedback_service,
             config=ResourceFeedbackResourceConfig,
+        )
+
+        self.marketplace_item_comment_resource = MarketplaceItemCommentResource(
+            service=self.marketplace_item_comment_service,
+            config=MarketplaceItemCommentResourceConfig,
+        )
+        self.marketplace_item_feedback_resource = MarketplaceItemFeedbackResource(
+            service=self.marketplace_item_feedback_service,
+            config=MarketplaceItemFeedbackResourceConfig,
         )
