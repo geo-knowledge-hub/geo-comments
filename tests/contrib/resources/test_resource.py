@@ -11,6 +11,8 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 
 from geo_comments.comments.records.api import CommentStatus
+from geo_comments.contrib.marketplace.comments.api import MarketplaceItemComment
+from geo_comments.contrib.marketplace.feedbacks.api import MarketplaceItemFeedback
 from geo_comments.contrib.packages.comments.api import PackageComment
 from geo_comments.contrib.packages.feedbacks.api import PackageFeedback
 from geo_comments.contrib.resources.comments.api import ResourceComment
@@ -52,6 +54,24 @@ from geo_comments.contrib.resources.feedbacks.api import ResourceFeedback
             "/feedback",
             ResourceFeedback,
             lazy_fixture("record_resource_simple"),
+            lazy_fixture("feedback_record_data"),
+            True,
+            True,
+        ),
+        (
+            "/marketplace/items",
+            "/comments",
+            MarketplaceItemComment,
+            lazy_fixture("record_marketplace_item_simple"),
+            lazy_fixture("comment_record_data"),
+            False,
+            False,
+        ),
+        (
+            "/marketplace/items",
+            "/feedback",
+            MarketplaceItemFeedback,
+            lazy_fixture("record_marketplace_item_simple"),
             lazy_fixture("feedback_record_data"),
             True,
             True,
