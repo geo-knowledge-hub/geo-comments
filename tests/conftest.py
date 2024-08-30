@@ -294,6 +294,39 @@ def minimal_record():
 
 
 @pytest.fixture(scope="module")
+def minimal_record_marketplace():
+    """Minimal record data as dict coming from the external world."""
+    return {
+        "pids": {},
+        "access": {
+            "record": "public",
+            "files": "public",
+        },
+        "files": {
+            "enabled": False,  # Most tests don't care about files
+        },
+        "metadata": {
+            "publication_date": "2020-06-01",
+            "resource_type": {"id": "image-photo"},
+            "creators": [
+                {
+                    "person_or_org": {
+                        "family_name": "Brown",
+                        "given_name": "Troy",
+                        "type": "personal",
+                    }
+                }
+            ],
+            "title": "A Romans story",
+            "marketplace": {
+                "launch_url": "https://test.com",
+                "vendor_contact": "email@test.com",
+            },
+        },
+    }
+
+
+@pytest.fixture(scope="module")
 def record_resource_simple(
     location, resource_type_v, authenticated_identity, minimal_record
 ):
@@ -325,11 +358,11 @@ def record_package_simple(
 
 @pytest.fixture(scope="module")
 def record_marketplace_item_simple(
-    location, resource_type_v, authenticated_identity, minimal_record
+    location, resource_type_v, authenticated_identity, minimal_record_marketplace
 ):
     """Basic Package Record."""
     record_item = current_marketplace_service.create(
-        authenticated_identity, minimal_record
+        authenticated_identity, minimal_record_marketplace
     )
     record_item = current_marketplace_service.publish(
         authenticated_identity, record_item["id"]
