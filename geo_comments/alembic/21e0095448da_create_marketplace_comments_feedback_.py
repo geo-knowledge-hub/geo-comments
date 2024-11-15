@@ -16,7 +16,7 @@ from sqlalchemy.dialects import mysql, postgresql
 revision = "21e0095448da"
 down_revision = "9ee00acd3274"
 branch_labels = ()
-depends_on = None
+depends_on = ("081eb89a9035",)  # GEO RDM Records - Marketplace tables
 
 
 def upgrade():
